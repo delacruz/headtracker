@@ -34,24 +34,28 @@ extern sensor_data_struct read_serial(int);
 	while (![[NSThread currentThread] isCancelled])
 	{
 		sensor_data_struct data = read_serial(serialFileDescriptor);
-		NSLog(@"\nheading: %f, pitch: %f, roll:%f", data.heading, data.pitch, data.roll);
-		NSString *headingString = [NSString stringWithFormat:@"%f", data.heading];
-		NSString *pitchString = [NSString stringWithFormat:@"%f", data.pitch];
-		NSString *rollString = [NSString stringWithFormat:@"%f", data.roll];
-		[heading setStringValue:headingString];
-		[pitch setStringValue:pitchString];
-		[roll setStringValue:rollString];
-		[theSensorView setSensorHeading:data.heading];
-		[theSensorView setSensorPitch:data.pitch];
-		[theSensorView setSensorRoll:data.roll];
-		[theSensorView setNeedsDisplay:YES];
+		[self willChangeValueForKey:@"heading"];
+		[self willChangeValueForKey:@"pitch"];
+		[self willChangeValueForKey:@"roll"];
+		heading = data.heading;
+		pitch = data.pitch;
+		roll = data.roll;
+		[self didChangeValueForKey:@"heading"];
+		[self didChangeValueForKey:@"pitch"];
+		[self didChangeValueForKey:@"roll"];
+		
+		NSLog(@"\nheading: %f, pitch: %f, roll:%f", heading, pitch, roll);
+		
 	}
 	[pool drain];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	// Insert code here to initialize your application 
-
+	
+	[self addObserver:self forKeyPath:@"heading" options:NSKeyValueObservingOptionOld context:nil];
+	[self addObserver:self forKeyPath:@"pitch" options:NSKeyValueObservingOptionOld context:nil];
+	[self addObserver:self forKeyPath:@"roll" options:NSKeyValueObservingOptionOld context:nil];
 	
 	if (serialFileDescriptor!=-1) {
 		[SerialReaderAppDelegate closePort:serialFileDescriptor];
@@ -64,8 +68,6 @@ extern sensor_data_struct read_serial(int);
 	serialFileDescriptor = [SerialReaderAppDelegate openPort];
 	readerThread = [[NSThread alloc] initWithTarget:self selector:@selector(readerLoop) object:nil];
 	[readerThread start];
-	//[NSThread detachNewThreadSelector:@selector(readerLoop) toTarget:self withObject:nil];
-	
 }
 
 - (IBAction)stopReadingSensorData:(id)sender
@@ -74,6 +76,16 @@ extern sensor_data_struct read_serial(int);
 	[readerThread release];
 	readerThread = nil;
 	close_port(serialFileDescriptor);
+}
+
+- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+	[theSensorView setSensorHeading:heading];
+	[theSensorView setSensorPitch:pitch];
+	[theSensorView setSensorRoll:roll];
+	[theSensorView setNeedsDisplay:YES];
+	
+	
 }
 
 @end
