@@ -1,0 +1,254 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXFileReference section */
+		4079525E0CEA38CC00E202DC /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		4079525F0CEA38CC00E202DC /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		969CFC8C128246A30009DF8C /* a2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = a2d.h; sourceTree = "<group>"; };
+		969CFC8D128246A30009DF8C /* a2d_10.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = a2d_10.c; sourceTree = "<group>"; };
+		969CFC8E128246A30009DF8C /* a2d_8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = a2d_8.c; sourceTree = "<group>"; };
+		969CFC8F128246A30009DF8C /* Args.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Args.c; sourceTree = "<group>"; };
+		969CFC90128246A30009DF8C /* Args.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Args.h; sourceTree = "<group>"; };
+		969CFC91128246A30009DF8C /* CBUF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBUF.h; sourceTree = "<group>"; };
+		969CFC92128246A30009DF8C /* Delay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Delay.c; sourceTree = "<group>"; };
+		969CFC93128246A30009DF8C /* i2c-master.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "i2c-master.c"; sourceTree = "<group>"; };
+		969CFC94128246A30009DF8C /* i2c-master.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "i2c-master.h"; sourceTree = "<group>"; };
+		969CFC95128246A30009DF8C /* i2c-slave-boot.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "i2c-slave-boot.c"; sourceTree = "<group>"; };
+		969CFC96128246A30009DF8C /* i2c-slave-boot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "i2c-slave-boot.h"; sourceTree = "<group>"; };
+		969CFC97128246A30009DF8C /* i2c-slave.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "i2c-slave.c"; sourceTree = "<group>"; };
+		969CFC98128246A30009DF8C /* i2c-slave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "i2c-slave.h"; sourceTree = "<group>"; };
+		969CFC99128246A30009DF8C /* lcd-hal-avr.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "lcd-hal-avr.c"; sourceTree = "<group>"; };
+		969CFC9A128246A30009DF8C /* lcd-stdio.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "lcd-stdio.c"; sourceTree = "<group>"; };
+		969CFC9B128246A30009DF8C /* memcpy_EP.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = memcpy_EP.S; sourceTree = "<group>"; };
+		969CFC9C128246A30009DF8C /* QD.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = QD.c; sourceTree = "<group>"; };
+		969CFC9D128246A30009DF8C /* QD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QD.h; sourceTree = "<group>"; };
+		969CFC9E128246A30009DF8C /* RCInput.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = RCInput.c; sourceTree = "<group>"; };
+		969CFC9F128246A30009DF8C /* RCInput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCInput.h; sourceTree = "<group>"; };
+		969CFCA1128246A30009DF8C /* Servo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Servo.c; sourceTree = "<group>"; };
+		969CFCA2128246A30009DF8C /* Servo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Servo.h; sourceTree = "<group>"; };
+		969CFCA5128246A30009DF8C /* UART.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UART.c; sourceTree = "<group>"; };
+		969CFCA6128246A30009DF8C /* UART.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UART.h; sourceTree = "<group>"; };
+		969CFCA8128246A30009DF8C /* AvrInfo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = AvrInfo.c; sourceTree = "<group>"; };
+		969CFCA9128246A30009DF8C /* AvrInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AvrInfo.h; sourceTree = "<group>"; };
+		969CFCAA128246A30009DF8C /* BootLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BootLoader.h; sourceTree = "<group>"; };
+		969CFCAB128246A30009DF8C /* Crc8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Crc8.c; sourceTree = "<group>"; };
+		969CFCAC128246A30009DF8C /* Crc8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crc8.h; sourceTree = "<group>"; };
+		969CFCAD128246A30009DF8C /* Delay.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Delay.h; sourceTree = "<group>"; };
+		969CFCAE128246A30009DF8C /* DumpMem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = DumpMem.c; sourceTree = "<group>"; };
+		969CFCAF128246A30009DF8C /* DumpMem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DumpMem.h; sourceTree = "<group>"; };
+		969CFCB0128246A30009DF8C /* i2c-io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "i2c-io.h"; sourceTree = "<group>"; };
+		969CFCB1128246A30009DF8C /* i2c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = i2c.h; sourceTree = "<group>"; };
+		969CFCB2128246A30009DF8C /* lcd-api.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "lcd-api.c"; sourceTree = "<group>"; };
+		969CFCB3128246A30009DF8C /* lcd-hal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "lcd-hal.h"; sourceTree = "<group>"; };
+		969CFCB4128246A30009DF8C /* lcd-printf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = "lcd-printf.c"; sourceTree = "<group>"; };
+		969CFCB5128246A30009DF8C /* lcd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = lcd.h; sourceTree = "<group>"; };
+		969CFCB6128246A30009DF8C /* Log.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Log.c; sourceTree = "<group>"; };
+		969CFCB7128246A30009DF8C /* Log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Log.h; sourceTree = "<group>"; };
+		969CFCB8128246A30009DF8C /* Str.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Str.h; sourceTree = "<group>"; };
+		969CFCB9128246A30009DF8C /* StrPrintf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = StrPrintf.c; sourceTree = "<group>"; };
+		969CFCE2128248630009DF8C /* Config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Config.h; sourceTree = "<group>"; };
+		969CFCE3128248630009DF8C /* Hardware.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Hardware.c; sourceTree = "<group>"; };
+		969CFCE4128248630009DF8C /* Hardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Hardware.h; sourceTree = "<group>"; };
+		969CFCE9128248A30009DF8C /* Robostix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Robostix.h; path = common/Robostix.h; sourceTree = SOURCE_ROOT; };
+		969CFCEA128248A30009DF8C /* Timer.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = Timer.c; path = common/Timer.c; sourceTree = SOURCE_ROOT; };
+		969CFCEB128248A30009DF8C /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Timer.h; path = common/Timer.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		4079523B0CEA382200E202DC = {
+			isa = PBXGroup;
+			children = (
+				969CFC8B128246A30009DF8C /* common */,
+				969CFCA7128246A30009DF8C /* shared */,
+				969CFC87128246810009DF8C /* config */,
+				4079525D0CEA38CC00E202DC /* firmware */,
+			);
+			sourceTree = "<group>";
+		};
+		4079525D0CEA38CC00E202DC /* firmware */ = {
+			isa = PBXGroup;
+			children = (
+				4079525F0CEA38CC00E202DC /* Makefile */,
+				4079525E0CEA38CC00E202DC /* main.c */,
+			);
+			path = firmware;
+			sourceTree = "<group>";
+		};
+		969CFC87128246810009DF8C /* config */ = {
+			isa = PBXGroup;
+			children = (
+				969CFCE2128248630009DF8C /* Config.h */,
+				969CFCE3128248630009DF8C /* Hardware.c */,
+				969CFCE4128248630009DF8C /* Hardware.h */,
+			);
+			path = config;
+			sourceTree = "<group>";
+		};
+		969CFC8B128246A30009DF8C /* common */ = {
+			isa = PBXGroup;
+			children = (
+				969CFCE9128248A30009DF8C /* Robostix.h */,
+				969CFCEA128248A30009DF8C /* Timer.c */,
+				969CFCEB128248A30009DF8C /* Timer.h */,
+				969CFC8C128246A30009DF8C /* a2d.h */,
+				969CFC8D128246A30009DF8C /* a2d_10.c */,
+				969CFC8E128246A30009DF8C /* a2d_8.c */,
+				969CFC8F128246A30009DF8C /* Args.c */,
+				969CFC90128246A30009DF8C /* Args.h */,
+				969CFC91128246A30009DF8C /* CBUF.h */,
+				969CFC92128246A30009DF8C /* Delay.c */,
+				969CFC93128246A30009DF8C /* i2c-master.c */,
+				969CFC94128246A30009DF8C /* i2c-master.h */,
+				969CFC95128246A30009DF8C /* i2c-slave-boot.c */,
+				969CFC96128246A30009DF8C /* i2c-slave-boot.h */,
+				969CFC97128246A30009DF8C /* i2c-slave.c */,
+				969CFC98128246A30009DF8C /* i2c-slave.h */,
+				969CFC99128246A30009DF8C /* lcd-hal-avr.c */,
+				969CFC9A128246A30009DF8C /* lcd-stdio.c */,
+				969CFC9B128246A30009DF8C /* memcpy_EP.S */,
+				969CFC9C128246A30009DF8C /* QD.c */,
+				969CFC9D128246A30009DF8C /* QD.h */,
+				969CFC9E128246A30009DF8C /* RCInput.c */,
+				969CFC9F128246A30009DF8C /* RCInput.h */,
+				969CFCA1128246A30009DF8C /* Servo.c */,
+				969CFCA2128246A30009DF8C /* Servo.h */,
+				969CFCA5128246A30009DF8C /* UART.c */,
+				969CFCA6128246A30009DF8C /* UART.h */,
+			);
+			name = common;
+			path = Common;
+			sourceTree = "<group>";
+		};
+		969CFCA7128246A30009DF8C /* shared */ = {
+			isa = PBXGroup;
+			children = (
+				969CFCA8128246A30009DF8C /* AvrInfo.c */,
+				969CFCA9128246A30009DF8C /* AvrInfo.h */,
+				969CFCAA128246A30009DF8C /* BootLoader.h */,
+				969CFCAB128246A30009DF8C /* Crc8.c */,
+				969CFCAC128246A30009DF8C /* Crc8.h */,
+				969CFCAD128246A30009DF8C /* Delay.h */,
+				969CFCAE128246A30009DF8C /* DumpMem.c */,
+				969CFCAF128246A30009DF8C /* DumpMem.h */,
+				969CFCB0128246A30009DF8C /* i2c-io.h */,
+				969CFCB1128246A30009DF8C /* i2c.h */,
+				969CFCB2128246A30009DF8C /* lcd-api.c */,
+				969CFCB3128246A30009DF8C /* lcd-hal.h */,
+				969CFCB4128246A30009DF8C /* lcd-printf.c */,
+				969CFCB5128246A30009DF8C /* lcd.h */,
+				969CFCB6128246A30009DF8C /* Log.c */,
+				969CFCB7128246A30009DF8C /* Log.h */,
+				969CFCB8128246A30009DF8C /* Str.h */,
+				969CFCB9128246A30009DF8C /* StrPrintf.c */,
+			);
+			name = shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		407952600CEA391500E202DC /* firmware */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = $ACTION;
+			buildConfigurationList = 407952610CEA393300E202DC /* Build configuration list for PBXLegacyTarget "firmware" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = firmware;
+			dependencies = (
+			);
+			name = firmware;
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+		969CFD6412824AF80009DF8C /* firmware install */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = install;
+			buildConfigurationList = 969CFD6512824AF80009DF8C /* Build configuration list for PBXLegacyTarget "firmware install" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = firmware;
+			dependencies = (
+			);
+			name = "firmware install";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		4079523D0CEA382200E202DC /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 4079523E0CEA382200E202DC /* Build configuration list for PBXProject "PanTilt" */;
+			compatibilityVersion = "Xcode 2.4";
+			hasScannedForEncodings = 0;
+			mainGroup = 4079523B0CEA382200E202DC;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				407952600CEA391500E202DC /* firmware */,
+				969CFD6412824AF80009DF8C /* firmware install */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		407952400CEA382200E202DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		407952630CEA393300E202DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PATH = "$(PATH):/usr/local/CrossPack-AVR/bin";
+			};
+			name = Release;
+		};
+		969CFD6612824AF80009DF8C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PATH = "$(PATH):/usr/local/CrossPack-AVR/bin";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4079523E0CEA382200E202DC /* Build configuration list for PBXProject "PanTilt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				407952400CEA382200E202DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		407952610CEA393300E202DC /* Build configuration list for PBXLegacyTarget "firmware" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				407952630CEA393300E202DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		969CFD6512824AF80009DF8C /* Build configuration list for PBXLegacyTarget "firmware install" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				969CFD6612824AF80009DF8C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4079523D0CEA382200E202DC /* Project object */;
+}
