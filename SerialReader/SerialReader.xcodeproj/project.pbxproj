@@ -12,6 +12,7 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		96033DF61283287D005BFC18 /* Crc8.c in Sources */ = {isa = PBXBuildFile; fileRef = 96033DF41283287D005BFC18 /* Crc8.c */; };
 		961721CC122DECE1009030C7 /* serialreader.c in Sources */ = {isa = PBXBuildFile; fileRef = 961721CB122DECE1009030C7 /* serialreader.c */; };
 		96E512541244103C00E2C83F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E512531244103C00E2C83F /* OpenGL.framework */; };
 		96E512581244104700E2C83F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E512571244104700E2C83F /* GLUT.framework */; };
@@ -31,6 +32,8 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107310486CEB800E47090 /* SerialReader-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SerialReader-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* SerialReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SerialReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		96033DF41283287D005BFC18 /* Crc8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Crc8.c; sourceTree = "<group>"; };
+		96033DF51283287D005BFC18 /* Crc8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Crc8.h; sourceTree = "<group>"; };
 		961721CB122DECE1009030C7 /* serialreader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = serialreader.c; sourceTree = "<group>"; };
 		9647FB4C1242F5F200AC4488 /* sensor_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensor_data.h; sourceTree = "<group>"; };
 		96E512531244103C00E2C83F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -107,6 +110,8 @@
 		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
 			isa = PBXGroup;
 			children = (
+				96033DF41283287D005BFC18 /* Crc8.c */,
+				96033DF51283287D005BFC18 /* Crc8.h */,
 				256AC3F00F4B6AF500CF3369 /* SerialReader_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				961721CB122DECE1009030C7 /* serialreader.c */,
@@ -193,6 +198,7 @@
 				256AC3DA0F4B6AC300CF3369 /* SerialReaderAppDelegate.m in Sources */,
 				961721CC122DECE1009030C7 /* serialreader.c in Sources */,
 				96E5125D1244110700E2C83F /* SensorView.m in Sources */,
+				96033DF61283287D005BFC18 /* Crc8.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -26,9 +26,7 @@ sensor_data_struct read_serial(int fd)
 	
 	read(fd, buffer, sizeof(buffer));
 	sscanf(buffer, "$C%fP%fR%f", &heading, &pitch, &roll);
-//	
-//		printf("\nread: %d: %s",readLen, buffer);
-//		printf("\ntranslates to heading: %f, pitch: %f, roll:%f", heading, pitch, roll);
+
 	sensor_data.heading = heading;
 	sensor_data.pitch = pitch;
 	sensor_data.roll = roll;
@@ -68,7 +66,43 @@ int open_port(void)
 	return (fd);
 }
 
+int open_write_port(void)
+{
+	int fd; /* File descriptor for the port */ 
+	
+	fd = open("/dev/tty.keyspan1", O_RDWR | O_NOCTTY | O_NDELAY);
+	if (fd == -1)
+	{
+		/*
+		 * Could not open the port.
+		 */
+		
+		perror("could not open port for writing");
+	}
+	else
+	{
+		fcntl(fd, F_SETFL, 0);
+		printf("Port now open...");
+		
+		struct termios options;
+		
+		tcgetattr(fd, &options);
+		
+		cfsetspeed(&options, B38400);
+		
+		options.c_cflag |= (CLOCAL | CREAD);
+		
+		tcsetattr(fd, TCSANOW, &options);
+		
+	}
+	return (fd);
+	
+}
 
+void write_serial(int fd, char *data, int length)
+{
+	write(fd, data, length);
+}
 
 void close_port(int fd)
 {

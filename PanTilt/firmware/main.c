@@ -33,6 +33,11 @@ int main(void)
 			LED_TOGGLE(RED);
 		}
 		
+		if(gTickCount%10==0) // 10Hz
+		{
+			
+		}
+		
 		if(gTickCount%20==0) // 5Hz
 		{
 			LED_TOGGLE(BLUE);
