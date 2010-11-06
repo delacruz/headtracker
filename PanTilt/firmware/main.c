@@ -9,11 +9,16 @@
 #include "Hardware.h"
 #include "Timer.h"
 #include "UART.h"
+#include <string.h>
+
+//extern int 
 
 int main(void)
 {
 	FILE   *u0;
     FILE   *u1;
+	//char bufferIn[255];
+	//int bufferIndex=0;
 	
 	InitHardware();
 	
@@ -27,25 +32,47 @@ int main(void)
     //char c;
 	
     for(;;){
+		
+		if(UART0_IsCharAvailable())
+		{
+			char c = UART0_GetCharStdio(u0);
+			
+			printf("Received %x\n",c);
+
+//			bufferIn[bufferIndex++] = c;
+//			int i;
+//			for (i = 0; i< bufferIndex; i++) 
+//			{
+//				printf("%x ", bufferIn[i]);
+//			}
+//			printf("\n");
+			LED_TOGGLE(BLUE);
+		}
 	
 		if(gTickCount%5==0)  // 20Hz
 		{
 			LED_TOGGLE(RED);
+			//UART0_PutCharStdio(0x4a,u0);
+
 		}
 		
 		if(gTickCount%10==0) // 10Hz
 		{
-			
+
 		}
 		
 		if(gTickCount%20==0) // 5Hz
 		{
-			LED_TOGGLE(BLUE);
+			
 		}
 		
 		if(gTickCount%50==0) // 2Hz
 		{
 			LED_TOGGLE(YELLOW);
+			unsigned short test = 0xBEEF;
+			unsigned char buffer[2];
+			memcpy(&buffer, &test, sizeof(short));
+			UART0_Write(buffer, sizeof(short));
 		}
 		
 		WaitForTimer0Rollover();

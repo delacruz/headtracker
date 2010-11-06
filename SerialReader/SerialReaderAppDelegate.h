@@ -11,22 +11,23 @@
 
 @interface SerialReaderAppDelegate : NSObject <NSApplicationDelegate> {
     NSWindow *window;
-	double heading, pitch, roll;
-	double prevHeading, prevPitch, prevRoll;
+	float heading, pitch, roll;
+	float prevHeading, prevPitch, prevRoll;
 	IBOutlet NSTextField *headingLabel;
 	IBOutlet NSTextField *pitchLabel;
 	IBOutlet NSTextField *rollLabel;
+	IBOutlet NSTextView *downlinkPanel;
 	IBOutlet NSSlider *headingSlider;
 	IBOutlet NSSlider *pitchSlider;
 	IBOutlet NSSlider *rollSlider;
 	int serialReadFileDescriptor;
 	int serialWriteFileDescriptor;
-//	short servoPulseHeading;
-//	short servoPulsePitch;
+	short servoPulseHeading;
+	short servoPulsePitch;
 	short servoPrevPulseHeading;
-	short servoPrevPulstPitch;
+	short servoPrevPulsePitch;
 	NSThread *readerThread;
-	NSThread *writerThread;
+	NSThread *downlinkThread;
 	IBOutlet SensorView *theSensorView;
 }
 

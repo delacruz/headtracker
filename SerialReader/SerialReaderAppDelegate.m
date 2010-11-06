@@ -10,12 +10,13 @@
 #import "sensor_data.h"
 #import "Crc8.h"
 
+// TODO: too many externs here, create and include .h file instead
 extern int open_port(void);
-extern int open_write_port(void);
+extern int open_uplink_downlink_port(void);
 extern void close_port(int);
-extern sensor_data_struct read_serial(int);
-extern void write_serial(int, char *, int length);
-
+extern sensor_data_struct read_sensor_port(int);
+extern void write_uplink(int, char *, int length);
+extern char read_downlink(int fd, unsigned char* buffer);
 
 @implementation SerialReaderAppDelegate
 
@@ -26,6 +27,11 @@ extern void write_serial(int, char *, int length);
 	return open_port();
 }
 
++ (int)openDownlinkPort
+{
+	return open_uplink_downlink_port();
+}
+
 + (void)closePort: (int)withFileDescriptor
 {
 	
@@ -34,9 +40,9 @@ extern void write_serial(int, char *, int length);
 - (void)readerLoop
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	while (![[NSThread currentThread] isCancelled])
+	while (![[NSThread currentThread] isCancelled] && serialReadFileDescriptor != -1)
 	{
-		sensor_data_struct data = read_serial(serialReadFileDescriptor);
+		sensor_data_struct data = read_sensor_port(serialReadFileDescriptor);
 		[self willChangeValueForKey:@"heading"];
 		//[self willChangeValueForKey:@"pitch"];
 		//[self willChangeValueForKey:@"roll"];
@@ -51,20 +57,83 @@ extern void write_serial(int, char *, int length);
 	[pool drain];
 }
 
+- (void)downlinkReaderLoop
+{
+	const int SIZE_FULL_FRAME = 8;
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	unsigned char downlinkFrame[255];
+	unsigned char buffer[255];
+	unsigned char* framePtr;
+	unsigned char frameIndex;
+	unsigned char numBytesRead;
+	
+	framePtr = &downlinkFrame[0];
+	
+	while (![[NSThread currentThread] isCancelled] && serialWriteFileDescriptor != -1)
+	{
+		// Get new bytes
+		numBytesRead = read_downlink(serialWriteFileDescriptor, buffer);
+		
+		// Append to our downlink frame
+		memcpy(framePtr, buffer, numBytesRead);
+		frameIndex += numBytesRead;
+		framePtr = &downlinkFrame[frameIndex];
+
+		if (frameIndex >= 1) 
+		{
+			// Verify frame starts with a header, otherwise reset
+			unsigned short frameHead;
+			memcpy(&frameHead, downlinkFrame, sizeof(short));
+			if (frameHead != 0xBEEF)
+			{
+				printf("%x and %x are not a header, resetting frame til we get a header...\n", downlinkFrame[0], downlinkFrame[1]);
+				frameIndex = 0;
+				framePtr = &downlinkFrame[0];
+				continue;
+			}
+		}
+
+		// Full frame? Check CRC and handle accordingly
+		if (frameIndex >= SIZE_FULL_FRAME-1) 
+		{
+			// TODO: implement, but for now just show what we got:
+			int i;
+			printf("\n Downlink Frame Contents: ");
+			for(i=0; i<SIZE_FULL_FRAME; i++)
+			{
+				printf("%x", downlinkFrame[i]);
+			}
+			printf("\n");
+			// Reset frame index pointer
+			frameIndex = 0;
+			framePtr = &downlinkFrame[0];
+		}
+		else 
+		{
+			NSLog(@"Incomplete - Total bytes so far: %d", frameIndex);
+		}
+
+	
+	}
+	[pool drain];
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	
 	// TODO: Add observer to only one struct, not three vars, easier to observe.
 	[self addObserver:self forKeyPath:@"heading" options:NSKeyValueObservingOptionOld context:nil];
-	//[self addObserver:self forKeyPath:@"pitch" options:NSKeyValueObservingOptionOld context:nil];
-	//[self addObserver:self forKeyPath:@"roll" options:NSKeyValueObservingOptionOld context:nil];
+	[self addObserver:self forKeyPath:@"pitch" options:NSKeyValueObservingOptionOld context:nil];
+	[self addObserver:self forKeyPath:@"roll" options:NSKeyValueObservingOptionOld context:nil];
 	
 	if (serialReadFileDescriptor!=-1) {
 		[SerialReaderAppDelegate closePort:serialReadFileDescriptor];
 	}
-	//servoPulsePitch = 1500;
-	//servoPulseHeading = 1500;
-	servoPrevPulstPitch = 1500;
+	servoPulsePitch = 1500;
+	servoPulseHeading = 1500;
+	servoPrevPulsePitch = 1500;
 	servoPrevPulseHeading = 1500;
+	
+	//[downlinkPanel textStorage]
 }
 
 - (IBAction)startReadingSensorData:(id)sender
@@ -72,6 +141,11 @@ extern void write_serial(int, char *, int length);
 	serialReadFileDescriptor = [SerialReaderAppDelegate openPort];
 	readerThread = [[NSThread alloc] initWithTarget:self selector:@selector(readerLoop) object:nil];
 	[readerThread start];
+	
+	serialWriteFileDescriptor = [SerialReaderAppDelegate openDownlinkPort];
+	downlinkThread = [[NSThread alloc] initWithTarget:self selector:@selector(downlinkReaderLoop) object:nil];
+	[downlinkThread start];
+	
 }
 
 - (IBAction)stopReadingSensorData:(id)sender
@@ -79,7 +153,11 @@ extern void write_serial(int, char *, int length);
 	[readerThread cancel];
 	[readerThread release];
 	readerThread = nil;
+	[downlinkThread cancel];
+	[downlinkThread release];
+	downlinkThread = nil;
 	close_port(serialReadFileDescriptor);
+	close_port(serialWriteFileDescriptor);
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
@@ -91,17 +169,14 @@ extern void write_serial(int, char *, int length);
 	[theSensorView setNeedsDisplay:YES];
 	
 	//NSLog(@"\nheading: %f, pitch: %f, roll:%f", heading, pitch, roll);
-	
-	
 
-	double headingDelta = heading - prevHeading;
+	float headingDelta = heading - prevHeading;
 	
 	// Handle the case where we pass 0 degrees
 	if (headingDelta >= 180.0) headingDelta -= 360.0;
 	else if(headingDelta <= -180.0) headingDelta += 360.0;
 
 	// Calculate the pan servo pulse width
-	short servoPulseHeading = 1500;
 	servoPulseHeading += (short)(headingDelta * 1000.0/180.0);
 	
 	// Limit the servo pwm range
@@ -116,7 +191,6 @@ extern void write_serial(int, char *, int length);
 		NSLog(@"Heading Servo Pulse: %d", servoPulseHeading);
 	}
 		
-
 	
 	// Send the data
 	// TODO: Prepare Packet: 0xBEEF-[2-byte Heading]-[2-byte Pitch]-[CRC]

@@ -32,7 +32,7 @@
 #define CFG_UART0_TX_BUFFER_SIZE    128
 #define CFG_UART0_LF_TO_CRLF        1
 #define CFG_UART0_CR_TO_LF          1
-#define CFG_UART0_ECHO_INPUT        1
+#define CFG_UART0_ECHO_INPUT        0
 
 #define CFG_UART1_RX_BUFFER_SIZE    128
 #define CFG_UART1_TX_BUFFER_SIZE    128

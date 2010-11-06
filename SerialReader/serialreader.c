@@ -17,7 +17,7 @@
 #include "sensor_data.h"
 
 
-sensor_data_struct read_serial(int fd)
+sensor_data_struct read_sensor_port(int fd)
 {
 	sensor_data_struct sensor_data;
 	char buffer[255];
@@ -66,11 +66,11 @@ int open_port(void)
 	return (fd);
 }
 
-int open_write_port(void)
+int open_uplink_downlink_port(void)
 {
 	int fd; /* File descriptor for the port */ 
 	
-	fd = open("/dev/tty.keyspan1", O_RDWR | O_NOCTTY | O_NDELAY);
+	fd = open("/dev/tty.KeySerial1", O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd == -1)
 	{
 		/*
@@ -99,13 +99,19 @@ int open_write_port(void)
 	
 }
 
-void write_serial(int fd, char *data, int length)
+void write_uplink(int fd, char *data, int length)
 {
 	write(fd, data, length);
+}
+
+
+int read_downlink(int fd, unsigned char *buffer)
+{
+	return read(fd, buffer, 255); // TODO: Define max buffer size in config or elsewhere
 }
 
 void close_port(int fd)
 {
 	close(fd);
-	printf("Port now closed...");
+	printf("Port %d now closed...", fd);
 }

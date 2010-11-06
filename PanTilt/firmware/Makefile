@@ -62,7 +62,7 @@ OBJECTS    = main.o Timer.o UART.o Hardware.o
 
 AVRDUDE = avrdude $(PROGRAMMER) -p $(DEVICE)
 # ORIGINAL #  COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE)
-COMPILE = avr-gcc -Wall -Werror -Wimplicit -Wpointer-arith -Wswitch -Wredundant-decls -Wreturn-type -Wshadow -Wunused -Wcast-qual -Wnested-externs -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -I . -I ../config -I ../common -I ../shared
+COMPILE = avr-gcc -Wall -Wimplicit -Wpointer-arith -Wswitch -Wredundant-decls -Wreturn-type -Wshadow -Wunused -Wcast-qual -Wnested-externs -Wmissing-prototypes -Wstrict-prototypes -Wmissing-declarations -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -I . -I ../config -I ../common -I ../shared
 
 # symbolic targets:
 all:	main.hex
