@@ -173,11 +173,12 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	float headingDelta = heading - prevHeading;
 	
 	// Handle the case where we pass 0 degrees
-	if (headingDelta >= 180.0) headingDelta -= 360.0;
-	else if(headingDelta <= -180.0) headingDelta += 360.0;
+	if (headingDelta > 180.0) headingDelta -= 360.0;
+	else if(headingDelta < -180.0) headingDelta += 360.0;
 
 	// Calculate the pan servo pulse width
-	servoPulseHeading += (short)(headingDelta * 1000.0/180.0);
+	float deltaFloat = headingDelta * 1000.0/180.0;
+	servoPulseHeading += deltaFloat;
 	
 	// Limit the servo pwm range
 	if(servoPulseHeading>2000) servoPulseHeading = 2000;
@@ -188,7 +189,7 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	{
 		prevHeading = heading;
 		servoPrevPulseHeading = servoPulseHeading;
-		NSLog(@"Heading Servo Pulse: %d", servoPulseHeading);
+		NSLog(@"Heading Servo Pulse: %f \t Heading Delta: %f", servoPulseHeading, headingDelta);
 	}
 		
 	

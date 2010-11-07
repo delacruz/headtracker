@@ -58,7 +58,7 @@ int main(void)
 		
 		if(gTickCount%10==0) // 10Hz
 		{
-
+			LED_TOGGLE(BLUE);
 		}
 		
 		if(gTickCount%20==0) // 5Hz
@@ -73,6 +73,7 @@ int main(void)
 			unsigned char buffer[2];
 			memcpy(&buffer, &test, sizeof(short));
 			UART0_Write(buffer, sizeof(short));
+			printf("Jason\n");
 		}
 		
 		WaitForTimer0Rollover();

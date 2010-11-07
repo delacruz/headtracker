@@ -22,10 +22,10 @@
 	IBOutlet NSSlider *rollSlider;
 	int serialReadFileDescriptor;
 	int serialWriteFileDescriptor;
-	short servoPulseHeading;
-	short servoPulsePitch;
-	short servoPrevPulseHeading;
-	short servoPrevPulsePitch;
+	float servoPulseHeading;
+	float servoPulsePitch;
+	float servoPrevPulseHeading;
+	float servoPrevPulsePitch;
 	NSThread *readerThread;
 	NSThread *downlinkThread;
 	IBOutlet SensorView *theSensorView;
