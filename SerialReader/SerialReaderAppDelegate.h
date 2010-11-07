@@ -24,8 +24,8 @@
 	int serialWriteFileDescriptor;
 	float servoPulseHeading;
 	float servoPulsePitch;
-	float servoPrevPulseHeading;
-	float servoPrevPulsePitch;
+	//float servoPrevPulseHeading;
+	//float servoPrevPulsePitch;
 	NSThread *readerThread;
 	NSThread *downlinkThread;
 	IBOutlet SensorView *theSensorView;

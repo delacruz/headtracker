@@ -130,8 +130,8 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	}
 	servoPulsePitch = 1500;
 	servoPulseHeading = 1500;
-	servoPrevPulsePitch = 1500;
-	servoPrevPulseHeading = 1500;
+//	servoPrevPulsePitch = 1500;
+//	servoPrevPulseHeading = 1500;
 	
 	//[downlinkPanel textStorage]
 }
@@ -183,15 +183,10 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	// Limit the servo pwm range
 	if(servoPulseHeading>2000) servoPulseHeading = 2000;
 	else if(servoPulseHeading<1000) servoPulseHeading = 1000;
-	
-	// If the change was significant enough to affect 1pw int, update
-	if(servoPrevPulseHeading!=servoPulseHeading)
-	{
-		prevHeading = heading;
-		servoPrevPulseHeading = servoPulseHeading;
-		NSLog(@"Heading Servo Pulse: %f \t Heading Delta: %f", servoPulseHeading, headingDelta);
-	}
-		
+
+	prevHeading = heading;
+
+	NSLog(@"Heading Servo Pulse: %f", servoPulseHeading);	
 	
 	// Send the data
 	// TODO: Prepare Packet: 0xBEEF-[2-byte Heading]-[2-byte Pitch]-[CRC]
