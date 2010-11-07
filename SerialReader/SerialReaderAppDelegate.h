@@ -8,10 +8,12 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SensorView.h"
+#import "sensor_data.h"
 
 @interface SerialReaderAppDelegate : NSObject <NSApplicationDelegate> {
     NSWindow *window;
 	float heading, pitch, roll;
+	//sensor_data_struct sensorData;
 	float prevHeading, prevPitch, prevRoll;
 	IBOutlet NSTextField *headingLabel;
 	IBOutlet NSTextField *pitchLabel;
@@ -22,10 +24,8 @@
 	IBOutlet NSSlider *rollSlider;
 	int serialReadFileDescriptor;
 	int serialWriteFileDescriptor;
-	float servoPulseHeading;
-	float servoPulsePitch;
-	//float servoPrevPulseHeading;
-	//float servoPrevPulsePitch;
+	float calculatedPulseHeading;
+	float calculatedPulsePitch;
 	NSThread *readerThread;
 	NSThread *downlinkThread;
 	IBOutlet SensorView *theSensorView;

@@ -10,6 +10,7 @@
 #include "Timer.h"
 #include "UART.h"
 #include <string.h>
+#include <util/crc16.h>
 
 //extern int 
 
@@ -38,6 +39,7 @@ int main(void)
 			char c = UART0_GetCharStdio(u0);
 			
 			printf("Received %x\n",c);
+
 
 //			bufferIn[bufferIndex++] = c;
 //			int i;
@@ -74,6 +76,17 @@ int main(void)
 			memcpy(&buffer, &test, sizeof(short));
 			UART0_Write(buffer, sizeof(short));
 			printf("Jason\n");
+			
+			uint16_t testBuffer[] = {0x06,0x03,0x07,0x07};
+			uint16_t crc = 0xffff;
+			
+			int i;
+			
+			for(i=0;i<4;i++)
+			{
+				crc = _crc16_update(crc, testBuffer[i]);
+			}
+			printf("\ncrc for 3677 is %hu \n", crc);
 		}
 		
 		WaitForTimer0Rollover();

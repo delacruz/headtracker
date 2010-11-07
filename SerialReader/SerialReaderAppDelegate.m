@@ -8,7 +8,7 @@
 
 #import "SerialReaderAppDelegate.h"
 #import "sensor_data.h"
-#import "Crc8.h"
+#import "crc16.h"
 
 // TODO: too many externs here, create and include .h file instead
 extern int open_port(void);
@@ -17,6 +17,8 @@ extern void close_port(int);
 extern sensor_data_struct read_sensor_port(int);
 extern void write_uplink(int, char *, int length);
 extern char read_downlink(int fd, unsigned char* buffer);
+
+#define PACKET_SIZE_HEADTRACKER 8
 
 @implementation SerialReaderAppDelegate
 
@@ -86,7 +88,7 @@ extern char read_downlink(int fd, unsigned char* buffer);
 			memcpy(&frameHead, downlinkFrame, sizeof(short));
 			if (frameHead != 0xBEEF)
 			{
-				printf("%x and %x are not a header, resetting frame til we get a header...\n", downlinkFrame[0], downlinkFrame[1]);
+				printf("%x %x not header, resetting...\n", downlinkFrame[0], downlinkFrame[1]);
 				frameIndex = 0;
 				framePtr = &downlinkFrame[0];
 				continue;
@@ -128,8 +130,8 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	if (serialReadFileDescriptor!=-1) {
 		[SerialReaderAppDelegate closePort:serialReadFileDescriptor];
 	}
-	servoPulsePitch = 1500;
-	servoPulseHeading = 1500;
+	calculatedPulsePitch = 1500;
+	calculatedPulseHeading = 1500;
 //	servoPrevPulsePitch = 1500;
 //	servoPrevPulseHeading = 1500;
 	
@@ -160,7 +162,10 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	close_port(serialWriteFileDescriptor);
 }
 
-- (void) observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+- (void) observeValueForKeyPath:(NSString *)keyPath 
+					   ofObject:(id)object 
+						 change:(NSDictionary *)change 
+						context:(void *)context
 {
 	// Update the OpenGL View
 	[theSensorView setSensorHeading:heading];
@@ -168,7 +173,7 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	[theSensorView setSensorRoll:roll];
 	[theSensorView setNeedsDisplay:YES];
 	
-	//NSLog(@"\nheading: %f, pitch: %f, roll:%f", heading, pitch, roll);
+#pragma mark Heading Pulse Calculation
 
 	float headingDelta = heading - prevHeading;
 	
@@ -178,26 +183,56 @@ extern char read_downlink(int fd, unsigned char* buffer);
 
 	// Calculate the pan servo pulse width
 	float deltaFloat = headingDelta * 1000.0/180.0;
-	servoPulseHeading += deltaFloat;
+	calculatedPulseHeading += deltaFloat;
+	
+	// Round the actual servo pulse width
+	short servoPulseHeading = (short)calculatedPulseHeading;
 	
 	// Limit the servo pwm range
-	if(servoPulseHeading>2000) servoPulseHeading = 2000;
-	else if(servoPulseHeading<1000) servoPulseHeading = 1000;
+	if(calculatedPulseHeading>2000) calculatedPulseHeading = 2000;
+	else if(calculatedPulseHeading<1000) calculatedPulseHeading = 1000;
 
 	prevHeading = heading;
 
-	NSLog(@"Heading Servo Pulse: %f", servoPulseHeading);	
+	NSLog(@"Heading Servo Pulse: %f", calculatedPulseHeading);	
 	
-	// Send the data
+#pragma mark Pitch Pulse Calculation
+	
+	// TODO: calculate pitch
+	short servoPulsePitch = 0xC0DE;
+	
+#pragma mark Build and Send Uplink Packet
+	
 	// TODO: Prepare Packet: 0xBEEF-[2-byte Heading]-[2-byte Pitch]-[CRC]
 	ushort header = 0xBEEF;
-	char buffer[255];
+	
+	unsigned char buffer[PACKET_SIZE_HEADTRACKER];
 	int offset = 0;
 	
-	memcpy(&buffer, &header, sizeof(header));
+	// 
+	memcpy(&buffer[offset], &header, sizeof(header));
 	offset += sizeof(header);
 	
+	memcpy(&buffer[offset], &servoPulseHeading, sizeof(short));
+	offset += sizeof(short);
 	
+	memcpy(&buffer[offset], &servoPulsePitch, sizeof(short));
+	offset += sizeof(short);
+	
+	// TODO: Create crc_append function in crc.c and remove the crap below
+	uint16_t crc = 0xffff;
+	for(int i=1; i<(PACKET_SIZE_HEADTRACKER-1); i++) // i=1 because we don't care to crc the header; -1 because the last slot is for the crc
+	{
+		crc = crc16_update(crc, buffer[i]);
+	}
+	// Append the crc to the end of the packet
+	memcpy(&buffer[PACKET_SIZE_HEADTRACKER-2], &crc, sizeof(crc));
+	
+	NSLog(@"the buffer is ready:");
+	for(int i=0; i< PACKET_SIZE_HEADTRACKER; i++)
+	{
+		printf("%.2X ", buffer[i]);
+	}
 	
 	//NSData *myData = [NSData dataWithBytes:buffer length:offset];
 
@@ -205,5 +240,7 @@ extern char read_downlink(int fd, unsigned char* buffer);
 
 	//write_serial(serialWriteFileDescriptor, <#char *data#>, <#int length#>)
 }
+
+
 
 @end
