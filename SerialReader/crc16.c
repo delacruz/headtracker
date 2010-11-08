@@ -24,3 +24,15 @@ uint16_t crc16_update(uint16_t crc, uint8_t a)
 	
 	return crc;
 }
+
+uint16_t crc16_array_update(uint8_t array, uint8_t length)
+{
+	uint16_t crc = 0xffff;
+	while (length>0)
+	{
+		crc = crc16_update(crc, array++);
+		length--;
+	}
+	
+	return crc;
+}

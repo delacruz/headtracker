@@ -10,7 +10,10 @@
 #import "crc16.h"
 #import "serialreader.h"
 
-#define PACKET_SIZE_HEADTRACKER 8
+#define HEADER_SIZE 2
+#define CRC_SIZE 2
+#define PAYLOAD_SIZE_HEADTRACKER 4
+#define PACKET_SIZE_HEADTRACKER HEADER_SIZE + PAYLOAD_SIZE_HEADTRACKER + CRC_SIZE
 
 @implementation SerialReaderAppDelegate
 
@@ -109,17 +112,13 @@
 	
 	// TODO: Add observer to only one struct, not three vars, easier to observe.
 	[self addObserver:self forKeyPath:@"heading" options:NSKeyValueObservingOptionOld context:nil];
-	[self addObserver:self forKeyPath:@"pitch" options:NSKeyValueObservingOptionOld context:nil];
-	[self addObserver:self forKeyPath:@"roll" options:NSKeyValueObservingOptionOld context:nil];
 	
 	if (serialReadFileDescriptor!=-1) {
 		[SerialReaderAppDelegate closePort:serialReadFileDescriptor];
 	}
 	calculatedPulsePitch = 1500;
 	calculatedPulseHeading = 1500;
-//	servoPrevPulsePitch = 1500;
-//	servoPrevPulseHeading = 1500;
-	
+
 	//[downlinkPanel textStorage]
 }
 
@@ -187,14 +186,14 @@
 	short servoPulsePitch = 0xC0DE;
 	
 #pragma mark Build and Send Uplink Packet
-	
-	// TODO: Prepare Packet: 0xBEEF-[2-byte Heading]-[2-byte Pitch]-[CRC]
+
 	ushort header = 0xBEEF;
+	
+	// TODO: Make "Prepare Packet" routine, takes payload, payload type, returns full prepared packet with crc.
 	
 	unsigned char buffer[PACKET_SIZE_HEADTRACKER];
 	int offset = 0;
 	
-	// 
 	memcpy(&buffer[offset], &header, sizeof(header));
 	offset += sizeof(header);
 	
@@ -204,12 +203,9 @@
 	memcpy(&buffer[offset], &servoPulsePitch, sizeof(short));
 	offset += sizeof(short);
 	
-	// TODO: Create crc_append function in crc.c and remove the crap below
 	uint16_t crc = 0xffff;
-	for(int i=1; i<(PACKET_SIZE_HEADTRACKER-1); i++) // i=1 because we don't care to crc the header; -1 because the last slot is for the crc
-	{
-		crc = crc16_update(crc, buffer[i]);
-	}
+	crc = crc16_array_update(buffer[2], PAYLOAD_SIZE_HEADTRACKER);
+	
 	// Append the crc to the end of the packet
 	memcpy(&buffer[PACKET_SIZE_HEADTRACKER-2], &crc, sizeof(crc));
 	
