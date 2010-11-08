@@ -7,16 +7,8 @@
 //
 
 #import "SerialReaderAppDelegate.h"
-#import "sensor_data.h"
 #import "crc16.h"
-
-// TODO: too many externs here, create and include .h file instead
-extern int open_port(void);
-extern int open_uplink_downlink_port(void);
-extern void close_port(int);
-extern sensor_data_struct read_sensor_port(int);
-extern void write_uplink(int, char *, int length);
-extern char read_downlink(int fd, unsigned char* buffer);
+#import "serialreader.h"
 
 #define PACKET_SIZE_HEADTRACKER 8
 
@@ -44,16 +36,9 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	while (![[NSThread currentThread] isCancelled] && serialReadFileDescriptor != -1)
 	{
-		sensor_data_struct data = read_sensor_port(serialReadFileDescriptor);
 		[self willChangeValueForKey:@"heading"];
-		//[self willChangeValueForKey:@"pitch"];
-		//[self willChangeValueForKey:@"roll"];
-		heading = data.heading;
-		pitch = data.pitch;
-		roll = data.roll;
+		read_sensor_port(serialReadFileDescriptor, &heading, &pitch, &roll);
 		[self didChangeValueForKey:@"heading"];
-		//[self didChangeValueForKey:@"pitch"];
-		//[self didChangeValueForKey:@"roll"];
 		
 	}
 	[pool drain];
@@ -185,12 +170,12 @@ extern char read_downlink(int fd, unsigned char* buffer);
 	float deltaFloat = headingDelta * 1000.0/180.0;
 	calculatedPulseHeading += deltaFloat;
 	
-	// Round the actual servo pulse width
-	short servoPulseHeading = (short)calculatedPulseHeading;
-	
 	// Limit the servo pwm range
 	if(calculatedPulseHeading>2000) calculatedPulseHeading = 2000;
 	else if(calculatedPulseHeading<1000) calculatedPulseHeading = 1000;
+	
+	// Round the actual servo pulse width
+	short servoPulseHeading = (short)calculatedPulseHeading;
 
 	prevHeading = heading;
 

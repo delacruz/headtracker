@@ -33,7 +33,7 @@
 		8D1107310486CEB800E47090 /* SerialReader-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SerialReader-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* SerialReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SerialReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		961721CB122DECE1009030C7 /* serialreader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = serialreader.c; sourceTree = "<group>"; };
-		9647FB4C1242F5F200AC4488 /* sensor_data.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sensor_data.h; sourceTree = "<group>"; };
+		9691F84712877AAD007C7864 /* serialreader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serialreader.h; sourceTree = "<group>"; };
 		96D2AF8C128749DD00715033 /* crc16.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc16.h; sourceTree = "<group>"; };
 		96D2AF8D128749DD00715033 /* crc16.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc16.c; sourceTree = "<group>"; };
 		96E512531244103C00E2C83F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
@@ -113,9 +113,9 @@
 				256AC3F00F4B6AF500CF3369 /* SerialReader_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				961721CB122DECE1009030C7 /* serialreader.c */,
-				9647FB4C1242F5F200AC4488 /* sensor_data.h */,
 				96D2AF8C128749DD00715033 /* crc16.h */,
 				96D2AF8D128749DD00715033 /* crc16.c */,
+				9691F84712877AAD007C7864 /* serialreader.h */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";

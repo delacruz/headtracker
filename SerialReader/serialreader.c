@@ -14,24 +14,14 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
-#include "sensor_data.h"
+#include "serialreader.h"
 
-
-sensor_data_struct read_sensor_port(int fd)
+void read_sensor_port(int fd, float *heading, float *pitch, float *roll)
 {
-	sensor_data_struct sensor_data;
 	char buffer[255];
-
-	float heading, pitch, roll;
 	
 	read(fd, buffer, sizeof(buffer));
-	sscanf(buffer, "$C%fP%fR%f", &heading, &pitch, &roll);
-
-	sensor_data.heading = heading;
-	sensor_data.pitch = pitch;
-	sensor_data.roll = roll;
-
-	return sensor_data;
+	sscanf(buffer, "$C%fP%fR%f", heading, pitch, roll);
 }
 
 int open_port(void)
@@ -105,7 +95,7 @@ void write_uplink(int fd, char *data, int length)
 }
 
 
-int read_downlink(int fd, unsigned char *buffer)
+char read_downlink(int fd, unsigned char *buffer)
 {
 	return read(fd, buffer, 255); // TODO: Define max buffer size in config or elsewhere
 }

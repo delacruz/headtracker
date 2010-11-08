@@ -8,7 +8,6 @@
 
 #import <Cocoa/Cocoa.h>
 #import "SensorView.h"
-#import "sensor_data.h"
 
 @interface SerialReaderAppDelegate : NSObject <NSApplicationDelegate> {
     NSWindow *window;
