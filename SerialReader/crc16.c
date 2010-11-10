@@ -52,7 +52,7 @@ char crc16_verify(void* array, uint8_t length)
 	crc = crc16_array_update(*ptr, length);
 	
 	uint16_t packet_crc;
-	memcpy(&packet_crc, ptr, 2);
+	memcpy(&packet_crc, ptr+length, 2);  // 4 is the payload size (header + crc)
 	
 	return crc == packet_crc;
 }

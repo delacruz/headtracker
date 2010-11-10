@@ -251,7 +251,11 @@ void scoot(unsigned char* buffer, unsigned char* index)
 		bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2x ",buffer[i]];
 	}
 	
-	//NSLog(@"%@", bytesAsString);
+	bytesAsString = [bytesAsString stringByAppendingFormat:@" crc = %.hu ",crc];
+	
+	NSLog(@"%@", bytesAsString);
+	
+	crc16_verify(buffer, PACKET_SIZE_HEADTRACKER);
 	
 	//NSData *myData = [NSData dataWithBytes:buffer length:offset];
 

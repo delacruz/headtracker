@@ -13,6 +13,7 @@
 #include <util/crc16.h>
 
 #define UPLINK_PACKET_SIZE 8
+#define UPLINK_REPORT_PACKET_SIZE 6
 
 void scoot(unsigned char* buffer, unsigned char* index);
 void scoot(unsigned char* buffer, unsigned char* index)
@@ -66,7 +67,7 @@ char crc16_verify(void* array, uint8_t length)
 	crc = crc16_array_update(*ptr, length);
 	
 	uint16_t packet_crc;
-	memcpy(&packet_crc, ptr, 2);
+	memcpy(&packet_crc, ptr+length, 2);  // length=length of payload
 	
 	return crc == packet_crc;
 }
@@ -77,21 +78,19 @@ int main(void)
     //FILE   *u1;
 	unsigned char uplinkFrame[255];
 	unsigned char uplinkFrameIndex=0;
+	unsigned char uplinkReportFrame[255];
+	unsigned char uplinkReportFrameIndex=0;
 	
 	uint16_t crcErrorsUplink = 0;
 	
 	InitHardware();
 	
-#if defined( __AVR_LIBC_VERSION__ )
     u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
-    //u1 = fdevopen( UART1_PutCharStdio, NULL );
-#else
-    //u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio, 0 );
-    //u1 = fdevopen( UART1_PutCharStdio, NULL, 0 );
-#endif
+
     //char c;
 	
-    for(;;){
+    while(1)
+	{
 		
 		int newStuff = 0;
 		
@@ -122,10 +121,11 @@ int main(void)
 			
 			while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
 			{
-				if(crc16_verify(uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
+				//printf("\nmore than one packet!\n");
+				if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
 				{
 					// Handle Packet
-					;
+					uplinkFrameIndex-=UPLINK_PACKET_SIZE;;
 				}
 				else 
 				{
@@ -136,25 +136,19 @@ int main(void)
 					memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
 					uplinkFrameIndex-=UPLINK_PACKET_SIZE;
 				}
+				
+				newStuff=0;
+				
+				LED_TOGGLE(BLUE);
 
 			}
-				
 
-
-			newStuff=0;
-			
-			LED_TOGGLE(BLUE);
 		}
-		
-
 	
 		if(gTickCount%5==0)  // 20Hz
 		{
 			LED_TOGGLE(RED);
 			//UART0_PutCharStdio(0x4a,u0);
-			
-			
-
 		}
 		
 		if(gTickCount%10==0) // 10Hz
@@ -181,8 +175,24 @@ int main(void)
 			{
 				crc = _crc16_update(crc, testBuffer[i]);
 			}
-
-			//UART0_Write(testBuffer, 18);
+			
+			printf("\nCRC BAD COUNT: %d", crcErrorsUplink);
+			
+			uint16_t header = 0xbeef;
+			
+			memcpy(uplinkReportFrame, &header, sizeof(header));
+			uplinkReportFrameIndex += sizeof(header);
+			
+			memcpy(uplinkReportFrame, &crcErrorsUplink, sizeof(crcErrorsUplink));
+			uplinkReportFrameIndex += sizeof(crcErrorsUplink);
+			
+			uint16_t crcUplinkReport = 0xffff;
+			crcUplinkReport = _crc16_update(crc, crcErrorsUplink);
+			
+			memcpy(uplinkReportFrame, &crcUplinkReport, sizeof(crcUplinkReport));
+			uplinkReportFrameIndex += sizeof(crcUplinkReport);
+			
+			UART0_Write(uplinkReportFrame, UPLINK_REPORT_PACKET_SIZE);
 
 		}
 		
