@@ -47,10 +47,30 @@
 	[pool drain];
 }
 
-void scoot(void *buffer, int index)
+void scoot(unsigned char* buffer, unsigned char* index)
 {
-	
+	// Discard bytes until a header is found
+	int i;
+	for(i=0; i+1<*index; i++)  // i+1 is needed as the header is 2 bytes
+	{
+		if (buffer[i]==0xef && buffer[i+1]==0xbe) 
+		{
+			if (i != 0)  // Frame header not at start of frame
+			{
+				// Move from header ownwards to start of frame
+				memcpy(buffer, &buffer[i], *index-i);
+				
+				// Adjust the index
+				*index -= i;
+			}
+			
+			// Done here, header at start of frame
+			break;
+		}
+	}
 }
+
+#define PRINTRX 1;
 
 - (void)downlinkReaderLoop
 {
@@ -58,7 +78,6 @@ void scoot(void *buffer, int index)
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	unsigned char downlinkFrame[255];
 	unsigned char buffer[255];
-	//unsigned char* framePtr;
 	unsigned char frameIndex = 0;
 	unsigned char numBytesRead;
 	
@@ -67,24 +86,54 @@ void scoot(void *buffer, int index)
 		// Get new bytes
 		numBytesRead = read_downlink(serialWriteFileDescriptor, buffer);
 		
+#if defined(PRINTRX)
+		
+		for(int i=0; i<numBytesRead; i++)
+		{
+			printf("%c", buffer[i]);
+		}
+		usleep(100);
+#else
+		
 		// Append to our downlink frame
 		memcpy(&downlinkFrame[frameIndex], buffer, numBytesRead);
 		frameIndex += numBytesRead;
-
 		
+		scoot(downlinkFrame, &frameIndex);
+		
+		
+
+//		// Discard bytes until a header is found
+//		for(int i=0; i+1<frameIndex; i++)  // i+1 is needed as the header is 2 bytes
+//		{
+//			if (downlinkFrame[i]==0xef && downlinkFrame[i+1]==0xbe) 
+//			{
+//				if (i != 0)  // Frame header not at start of frame
+//				{
+//					// Move from header ownwards to start of frame
+//					memcpy(downlinkFrame, &downlinkFrame[i], frameIndex-i);
+//					
+//					// Adjust the index
+//					frameIndex -= i;
+//				}
+//				
+//				// Done here, header at start of frame
+//				break;
+//			}
+//		}
 		
 
 		// Full frame? Check CRC and handle accordingly
 		if (frameIndex >= SIZE_FULL_FRAME-1) 
 		{
 			// TODO: implement, but for now just show what we got:
-			int i;
-			printf("\n Downlink Frame Contents: ");
-			for(i=0; i<SIZE_FULL_FRAME; i++)
-			{
-				printf("%x", downlinkFrame[i]);
-			}
-			printf("\n");
+			//int i;
+			//printf("\n Downlink Frame Contents: ");
+			//for(i=0; i<SIZE_FULL_FRAME; i++)
+			//{
+//				printf("%x", downlinkFrame[i]);
+//			}
+			//printf("\n");
 			// Reset frame index pointer
 			frameIndex = 0;
 			//framePtr = &downlinkFrame[0];
@@ -94,7 +143,7 @@ void scoot(void *buffer, int index)
 			NSLog(@"Incomplete - Total bytes so far: %d", frameIndex);
 		}
 		
-
+#endif
 	}
 	[pool drain];
 }
@@ -104,13 +153,8 @@ void scoot(void *buffer, int index)
 	// TODO: Add observer to only one struct, not three vars, easier to observe.
 	[self addObserver:self forKeyPath:@"heading" options:NSKeyValueObservingOptionOld context:nil];
 	
-	if (serialReadFileDescriptor!=-1) {
-		[SerialReaderAppDelegate closePort:serialReadFileDescriptor];
-	}
 	calculatedPulsePitch = 1500;
 	calculatedPulseHeading = 1500;
-
-	//[downlinkPanel textStorage]
 }
 
 - (IBAction)startReadingSensorData:(id)sender
@@ -169,7 +213,7 @@ void scoot(void *buffer, int index)
 
 	prevHeading = heading;
 
-	NSLog(@"Heading Servo Pulse: %f", calculatedPulseHeading);	
+	//NSLog(@"Heading Servo Pulse: %f", calculatedPulseHeading);	
 	
 #pragma mark Pitch Pulse Calculation
 	
@@ -200,17 +244,20 @@ void scoot(void *buffer, int index)
 	// Append the crc to the end of the packet
 	memcpy(&buffer[PACKET_SIZE_HEADTRACKER-2], &crc, sizeof(crc));
 	
-	NSLog(@"the buffer is ready:");
+	NSString *bytesAsString = [NSString stringWithString:@"Uplink: "];
+	
 	for(int i=0; i< PACKET_SIZE_HEADTRACKER; i++)
 	{
-		printf("%.2X ", buffer[i]);
+		bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2x ",buffer[i]];
 	}
+	
+	//NSLog(@"%@", bytesAsString);
 	
 	//NSData *myData = [NSData dataWithBytes:buffer length:offset];
 
 	//NSLog(@"offset: %d short size: %d byte: %@ \n",offset,1,myData);
 
-	//write_serial(serialWriteFileDescriptor, <#char *data#>, <#int length#>)
+	write_uplink(serialWriteFileDescriptor, buffer, PACKET_SIZE_HEADTRACKER);
 }
 
 

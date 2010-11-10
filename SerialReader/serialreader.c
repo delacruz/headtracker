@@ -89,9 +89,12 @@ int open_uplink_downlink_port(void)
 	
 }
 
-void write_uplink(int fd, char *data, int length)
+void write_uplink(int fd, unsigned char *data, int length)
 {
-	write(fd, data, length);
+	if (fd!=0)
+	{
+		write(fd, data, length);
+	}
 }
 
 
@@ -102,6 +105,7 @@ char read_downlink(int fd, unsigned char *buffer)
 
 void close_port(int fd)
 {
+	if (fd==-1) return;
 	close(fd);
 	printf("Port %d now closed...", fd);
 }

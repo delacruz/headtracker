@@ -17,7 +17,6 @@
 	IBOutlet NSTextField *headingLabel;
 	IBOutlet NSTextField *pitchLabel;
 	IBOutlet NSTextField *rollLabel;
-	IBOutlet NSTextView *downlinkPanel;
 	IBOutlet NSSlider *headingSlider;
 	IBOutlet NSSlider *pitchSlider;
 	IBOutlet NSSlider *rollSlider;

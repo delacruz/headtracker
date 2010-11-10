@@ -12,21 +12,79 @@
 #include <string.h>
 #include <util/crc16.h>
 
-//extern int 
+#define UPLINK_PACKET_SIZE 8
+
+void scoot(unsigned char* buffer, unsigned char* index);
+void scoot(unsigned char* buffer, unsigned char* index)
+{
+	// Discard bytes until a header is found
+	int i;
+	for(i=0; i+1<*index; i++)  // i+1 is needed as the header is 2 bytes
+	{
+		if (buffer[i]==0xef && buffer[i+1]==0xbe) 
+		{
+			if (i != 0)  // Frame header not at start of frame
+			{
+				// Move from header ownwards to start of frame
+				memcpy(buffer, &buffer[i], *index-i);
+				
+				// Adjust the index
+				*index -= i;
+			}
+			
+			// Done here, header at start of frame
+			break;
+		}
+	}
+}
+
+uint16_t crc16_array_update(uint8_t array, uint8_t length);
+uint16_t crc16_array_update(uint8_t array, uint8_t length)
+{
+	uint16_t crc = 0xffff;
+	while (length>0)
+	{
+		crc = _crc16_update(crc, array++);
+		length--;
+	}
+	
+	return crc;
+}
+
+char crc16_verify(void* array, uint8_t length);
+char crc16_verify(void* array, uint8_t length)
+{
+	uint16_t crc = 0xffff;
+	
+	uint8_t *ptr = (uint8_t *)array;
+	
+	// Skip header
+	ptr+=2;  // TODO: define HEADER_SIZE somewhere, and include
+	
+	length-=4; // TODO: define CRC_SIZE somewhere, and include
+	
+	crc = crc16_array_update(*ptr, length);
+	
+	uint16_t packet_crc;
+	memcpy(&packet_crc, ptr, 2);
+	
+	return crc == packet_crc;
+}
 
 int main(void)
 {
 	FILE   *u0;
-    FILE   *u1;
+    //FILE   *u1;
 	unsigned char uplinkFrame[255];
-	unsigned char bufferIn[255];
-	unsigned char bufferIndex=0;
+	unsigned char uplinkFrameIndex=0;
+	
+	uint16_t crcErrorsUplink = 0;
 	
 	InitHardware();
 	
 #if defined( __AVR_LIBC_VERSION__ )
     u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
-    u1 = fdevopen( UART1_PutCharStdio, NULL );
+    //u1 = fdevopen( UART1_PutCharStdio, NULL );
 #else
     //u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio, 0 );
     //u1 = fdevopen( UART1_PutCharStdio, NULL, 0 );
@@ -35,27 +93,78 @@ int main(void)
 	
     for(;;){
 		
+		int newStuff = 0;
+		
 		while(UART0_IsCharAvailable())
 		{
-			bufferIn[bufferIndex++] = UART0_GetChar();;
+			uplinkFrame[uplinkFrameIndex++] = UART0_GetChar();
+			newStuff = 1;
 		}
+		
+		if (newStuff==1) 
+		{
+//			printf("\n Before Scoot: ");
+//			int i;
+//			for (i=0; i<uplinkFrameIndex; i++) 
+//			{
+//				printf("%.2X ", uplinkFrame[i]);
+//			}
+			
+			scoot(uplinkFrame, &uplinkFrameIndex);
+			
+//			printf("\n After Scoot: ");
+//			
+//			for (i=0; i<uplinkFrameIndex; i++) 
+//			{
+//				printf("%.2X ", uplinkFrame[i]);
+//			}
+			
+			
+			while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
+			{
+				if(crc16_verify(uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
+				{
+					// Handle Packet
+					;
+				}
+				else 
+				{
+					// Update crc error counter
+					crcErrorsUplink++;
+					
+					// Pop the packet
+					memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
+					uplinkFrameIndex-=UPLINK_PACKET_SIZE;
+				}
+
+			}
+				
+
+
+			newStuff=0;
+			
+			LED_TOGGLE(BLUE);
+		}
+		
 
 	
 		if(gTickCount%5==0)  // 20Hz
 		{
 			LED_TOGGLE(RED);
 			//UART0_PutCharStdio(0x4a,u0);
+			
+			
 
 		}
 		
 		if(gTickCount%10==0) // 10Hz
 		{
-			//LED_TOGGLE(BLUE);
+
 		}
 		
 		if(gTickCount%20==0) // 5Hz
 		{
-			
+
 		}
 		
 		if(gTickCount%50==0) // 2Hz
@@ -73,7 +182,7 @@ int main(void)
 				crc = _crc16_update(crc, testBuffer[i]);
 			}
 
-			UART0_Write(testBuffer, 18);
+			//UART0_Write(testBuffer, 18);
 
 		}
 		
