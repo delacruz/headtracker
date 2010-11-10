@@ -333,7 +333,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>96BFC88D128B1131007EE114</string>
+										<string>96BFC8D7128B1E99007EE114</string>
 										<key>history</key>
 										<array>
 											<string>96172216122F4525009030C7</string>
@@ -367,14 +367,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 0}, {973, 842}}</string>
+								<string>{{0, 0}, {973, 735}}</string>
 								<key>RubberWindowFrame</key>
 								<string>146 78 1205 950 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
 							<key>Proportion</key>
-							<string>842pt</string>
+							<string>735pt</string>
 						</dict>
 						<dict>
 							<key>ContentConfiguration</key>
@@ -387,14 +387,14 @@
 							<key>GeometryConfiguration</key>
 							<dict>
 								<key>Frame</key>
-								<string>{{0, 847}, {973, 62}}</string>
+								<string>{{0, 740}, {973, 169}}</string>
 								<key>RubberWindowFrame</key>
 								<string>146 78 1205 950 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
 							<key>Proportion</key>
-							<string>62pt</string>
+							<string>169pt</string>
 						</dict>
 					</array>
 					<key>Proportion</key>
@@ -553,12 +553,12 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>96BFC88E128B1131007EE114</string>
+		<string>96BFC8D8128B1E99007EE114</string>
 		<string>96BFC7F0128AF43A007EE114</string>
 		<string>96BFC7F1128AF43A007EE114</string>
 		<string>96172222122F4525009030C7</string>
-		<string>/Users/jason/Projects/headtracker/SerialReader/SerialReader.xcodeproj</string>
 		<string>1CD10A99069EF8BA00B06720</string>
+		<string>/Users/jason/Projects/headtracker/SerialReader/SerialReader.xcodeproj</string>
 		<string>1C78EAAD065D492600B07095</string>
 	</array>
 	<key>WindowString</key>
@@ -654,7 +654,7 @@
 			<key>WindowToolGUID</key>
 			<string>96172222122F4525009030C7</string>
 			<key>WindowToolIsVisible</key>
-			<true/>
+			<false/>
 		</dict>
 		<dict>
 			<key>FirstTimeWindowDisplayed</key>

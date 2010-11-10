@@ -80,6 +80,8 @@ int main(void)
 	unsigned char uplinkFrameIndex=0;
 	unsigned char uplinkReportFrame[255];
 	unsigned char uplinkReportFrameIndex=0;
+	uint16_t panServoPulse = 1500;
+	uint16_t tiltServoPulse = 1500;
 	
 	uint16_t crcErrorsUplink = 0;
 	
@@ -100,7 +102,7 @@ int main(void)
 			newStuff = 1;
 		}
 		
-		if (newStuff==1) 
+		if (newStuff==1) // TODO: NOT NECESSARY?!  REMOVE
 		{
 //			printf("\n Before Scoot: ");
 //			int i;
@@ -118,14 +120,25 @@ int main(void)
 //				printf("%.2X ", uplinkFrame[i]);
 //			}
 			
-			
+			// Handle all available packets in Rx buffer
 			while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
 			{
 				//printf("\nmore than one packet!\n");
 				if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
 				{
 					// Handle Packet
-					uplinkFrameIndex-=UPLINK_PACKET_SIZE;;
+					uint16_t *ptr = (uint16_t*)uplinkFrame;
+					memcpy(&panServoPulse, ptr, sizeof(panServoPulse));
+					ptr += sizeof(panServoPulse);
+					
+					memcpy(&tiltServoPulse, ptr, sizeof(tiltServoPulse));
+					ptr += sizeof(tiltServoPulse);
+					
+					printf("\nPan Servo Pulse: %d\tTilt Servo Pulse: %d", panServoPulse, tiltServoPulse);
+					
+					// Pop the packet
+					memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
+					uplinkFrameIndex-=UPLINK_PACKET_SIZE;
 				}
 				else 
 				{
@@ -165,16 +178,16 @@ int main(void)
 		{
 			LED_TOGGLE(YELLOW);
 			
-			uint8_t testBuffer[] = {0x06,0x03,0x07,0x07,0x06,0x03,0xef,0xbe,0x07,0x07,0x06,0x03,0xef,0xbe,0x19,0x12,0x34,0xff};
-			
-			uint16_t crc = 0xffff;
-		
-			int i;
-			
-			for(i=0;i<sizeof(testBuffer);i++)
-			{
-				crc = _crc16_update(crc, testBuffer[i]);
-			}
+//			uint8_t testBuffer[] = {0x06,0x03,0x07,0x07,0x06,0x03,0xef,0xbe,0x07,0x07,0x06,0x03,0xef,0xbe,0x19,0x12,0x34,0xff};
+//			
+//			uint16_t crc = 0xffff;
+//		
+//			int i;
+//			
+//			for(i=0;i<sizeof(testBuffer);i++)
+//			{
+//				crc = _crc16_update(crc, testBuffer[i]);
+//			}
 			
 			printf("\nCRC BAD COUNT: %d", crcErrorsUplink);
 			
@@ -187,7 +200,7 @@ int main(void)
 			uplinkReportFrameIndex += sizeof(crcErrorsUplink);
 			
 			uint16_t crcUplinkReport = 0xffff;
-			crcUplinkReport = _crc16_update(crc, crcErrorsUplink);
+			crcUplinkReport = _crc16_update(crcUplinkReport, crcErrorsUplink);
 			
 			memcpy(uplinkReportFrame, &crcUplinkReport, sizeof(crcUplinkReport));
 			uplinkReportFrameIndex += sizeof(crcUplinkReport);
