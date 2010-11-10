@@ -47,17 +47,20 @@
 	[pool drain];
 }
 
+void scoot(void *buffer, int index)
+{
+	
+}
+
 - (void)downlinkReaderLoop
 {
 	const int SIZE_FULL_FRAME = 8;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	unsigned char downlinkFrame[255];
 	unsigned char buffer[255];
-	unsigned char* framePtr;
-	unsigned char frameIndex;
+	//unsigned char* framePtr;
+	unsigned char frameIndex = 0;
 	unsigned char numBytesRead;
-	
-	framePtr = &downlinkFrame[0];
 	
 	while (![[NSThread currentThread] isCancelled] && serialWriteFileDescriptor != -1)
 	{
@@ -65,23 +68,11 @@
 		numBytesRead = read_downlink(serialWriteFileDescriptor, buffer);
 		
 		// Append to our downlink frame
-		memcpy(framePtr, buffer, numBytesRead);
+		memcpy(&downlinkFrame[frameIndex], buffer, numBytesRead);
 		frameIndex += numBytesRead;
-		framePtr = &downlinkFrame[frameIndex];
 
-		if (frameIndex >= 1) 
-		{
-			// Verify frame starts with a header, otherwise reset
-			unsigned short frameHead;
-			memcpy(&frameHead, downlinkFrame, sizeof(short));
-			if (frameHead != 0xBEEF)
-			{
-				printf("%x %x not header, resetting...\n", downlinkFrame[0], downlinkFrame[1]);
-				frameIndex = 0;
-				framePtr = &downlinkFrame[0];
-				continue;
-			}
-		}
+		
+		
 
 		// Full frame? Check CRC and handle accordingly
 		if (frameIndex >= SIZE_FULL_FRAME-1) 
@@ -96,14 +87,14 @@
 			printf("\n");
 			// Reset frame index pointer
 			frameIndex = 0;
-			framePtr = &downlinkFrame[0];
+			//framePtr = &downlinkFrame[0];
 		}
 		else 
 		{
 			NSLog(@"Incomplete - Total bytes so far: %d", frameIndex);
 		}
+		
 
-	
 	}
 	[pool drain];
 }

@@ -18,8 +18,9 @@ int main(void)
 {
 	FILE   *u0;
     FILE   *u1;
-	//char bufferIn[255];
-	//int bufferIndex=0;
+	unsigned char uplinkFrame[255];
+	unsigned char bufferIn[255];
+	unsigned char bufferIndex=0;
 	
 	InitHardware();
 	
@@ -34,22 +35,11 @@ int main(void)
 	
     for(;;){
 		
-		if(UART0_IsCharAvailable())
+		while(UART0_IsCharAvailable())
 		{
-			char c = UART0_GetCharStdio(u0);
-			
-			printf("Received %x\n",c);
-
-
-//			bufferIn[bufferIndex++] = c;
-//			int i;
-//			for (i = 0; i< bufferIndex; i++) 
-//			{
-//				printf("%x ", bufferIn[i]);
-//			}
-//			printf("\n");
-			LED_TOGGLE(BLUE);
+			bufferIn[bufferIndex++] = UART0_GetChar();;
 		}
+
 	
 		if(gTickCount%5==0)  // 20Hz
 		{
@@ -60,7 +50,7 @@ int main(void)
 		
 		if(gTickCount%10==0) // 10Hz
 		{
-			LED_TOGGLE(BLUE);
+			//LED_TOGGLE(BLUE);
 		}
 		
 		if(gTickCount%20==0) // 5Hz
@@ -71,22 +61,20 @@ int main(void)
 		if(gTickCount%50==0) // 2Hz
 		{
 			LED_TOGGLE(YELLOW);
-			unsigned short test = 0xBEEF;
-			unsigned char buffer[2];
-			memcpy(&buffer, &test, sizeof(short));
-			UART0_Write(buffer, sizeof(short));
-			printf("Jason\n");
 			
-			uint16_t testBuffer[] = {0x06,0x03,0x07,0x07};
+			uint8_t testBuffer[] = {0x06,0x03,0x07,0x07,0x06,0x03,0xef,0xbe,0x07,0x07,0x06,0x03,0xef,0xbe,0x19,0x12,0x34,0xff};
+			
 			uint16_t crc = 0xffff;
-			
+		
 			int i;
 			
-			for(i=0;i<4;i++)
+			for(i=0;i<sizeof(testBuffer);i++)
 			{
 				crc = _crc16_update(crc, testBuffer[i]);
 			}
-			printf("\ncrc for 3677 is %hu \n", crc);
+
+			UART0_Write(testBuffer, 18);
+
 		}
 		
 		WaitForTimer0Rollover();

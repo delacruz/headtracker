@@ -8,6 +8,7 @@
  */
 
 #include "crc16.h"
+#include <string.h>
 
 uint16_t crc16_update(uint16_t crc, uint8_t a)
 {
@@ -35,4 +36,23 @@ uint16_t crc16_array_update(uint8_t array, uint8_t length)
 	}
 	
 	return crc;
+}
+
+char crc16_verify(void* array, uint8_t length)
+{
+	uint16_t crc = 0xffff;
+	
+	uint8_t *ptr = (uint8_t *)array;
+	
+	// Skip header
+	ptr+=2;  // TODO: define HEADER_SIZE somewhere, and include
+	
+	length-=4; // TODO: define CRC_SIZE somewhere, and include
+	
+	crc = crc16_array_update(*ptr, length);
+	
+	uint16_t packet_crc;
+	memcpy(&packet_crc, ptr, 2);
+	
+	return crc == packet_crc;
 }

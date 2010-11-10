@@ -97,7 +97,7 @@ void write_uplink(int fd, char *data, int length)
 
 char read_downlink(int fd, unsigned char *buffer)
 {
-	return read(fd, buffer, 255); // TODO: Define max buffer size in config or elsewhere
+	return read(fd, buffer, 128); // TODO: Define max buffer size in config or elsewhere
 }
 
 void close_port(int fd)
