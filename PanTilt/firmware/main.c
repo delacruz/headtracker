@@ -39,13 +39,14 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	}
 }
 
-uint16_t crc16_array_update(uint8_t array, uint8_t length);
-uint16_t crc16_array_update(uint8_t array, uint8_t length)
+uint16_t crc16_array_update(const void* array, uint8_t length);
+uint16_t crc16_array_update(const void* array, uint8_t length)
 {
+	const uint8_t *ptr = (uint8_t*)array;
 	uint16_t crc = 0xffff;
 	while (length>0)
 	{
-		crc = _crc16_update(crc, array++);
+		crc = _crc16_update(crc, *ptr++);
 		length--;
 	}
 	
@@ -86,7 +87,7 @@ int main(void)
 	uint16_t panServoPulse = 1500;
 	uint16_t tiltServoPulse = 1500;
 	
-	uint16_t crcErrorsUplink = 0;
+	uint16_t crcErrorCountUplink = 0;
 	
 	InitHardware();
 	
@@ -151,16 +152,16 @@ int main(void)
 				}
 				else 
 				{
-					printf("\nBad CRC, for packet: ");
-					int i;
-					for (i=0; i<uplinkFrameIndex; i++) 
-					{
-						printf("%.2X ", uplinkFrame[i]);
-					}
-					
+//					printf("\nBad CRC, for packet: ");
+//					int i;
+//					for (i=0; i<uplinkFrameIndex; i++) 
+//					{
+//						printf("%.2X ", uplinkFrame[i]);
+//					}
+//					
 					
 					// Update crc error counter
-					crcErrorsUplink++;
+					crcErrorCountUplink++;
 					
 					// Pop the packet
 					memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
@@ -177,8 +178,7 @@ int main(void)
 	
 		if(gTickCount%5==0)  // 20Hz
 		{
-			LED_TOGGLE(RED);
-			//UART0_PutCharStdio(0x4a,u0);
+
 		}
 		
 		if(gTickCount%10==0) // 10Hz
@@ -193,36 +193,23 @@ int main(void)
 		
 		if(gTickCount%50==0) // 2Hz
 		{
-			LED_TOGGLE(YELLOW);
-			
-//			uint8_t testBuffer[] = {0x06,0x03,0x07,0x07,0x06,0x03,0xef,0xbe,0x07,0x07,0x06,0x03,0xef,0xbe,0x19,0x12,0x34,0xff};
-//			
-//			uint16_t crc = 0xffff;
-//		
-//			int i;
-//			
-//			for(i=0;i<sizeof(testBuffer);i++)
-//			{
-//				crc = _crc16_update(crc, testBuffer[i]);
-//			}
-			
-			printf("\nCRC BAD COUNT: %hu", crcErrorsUplink);
 			
 			uint16_t header = 0xbeef;
+			uplinkReportFrameIndex = 0;
 			
 			memcpy(uplinkReportFrame, &header, sizeof(header));
 			uplinkReportFrameIndex += sizeof(header);
 			
-			memcpy(uplinkReportFrame, &crcErrorsUplink, sizeof(crcErrorsUplink));
-			uplinkReportFrameIndex += sizeof(crcErrorsUplink);
+			memcpy(&uplinkReportFrame[uplinkReportFrameIndex], &crcErrorCountUplink, sizeof(crcErrorCountUplink));
+			uplinkReportFrameIndex += sizeof(crcErrorCountUplink);
 			
-			uint16_t crcUplinkReport = 0xffff;
-			crcUplinkReport = _crc16_update(crcUplinkReport, crcErrorsUplink);
+			uint16_t crc = 0xffff;
+			crc = _crc16_update(crc, crcErrorCountUplink);
 			
-			memcpy(uplinkReportFrame, &crcUplinkReport, sizeof(crcUplinkReport));
-			uplinkReportFrameIndex += sizeof(crcUplinkReport);
+			memcpy(&uplinkReportFrame[uplinkReportFrameIndex], &crc, sizeof(crc));
+			uplinkReportFrameIndex += sizeof(crc);
 			
-			//UART0_Write(uplinkReportFrame, UPLINK_REPORT_PACKET_SIZE);
+			UART0_Write(uplinkReportFrame, UPLINK_REPORT_PACKET_SIZE);
 
 		}
 		

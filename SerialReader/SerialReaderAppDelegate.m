@@ -70,15 +70,15 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	}
 }
 
-#define PRINTRX 1;
+#define PRINTRX 0
 
 - (void)downlinkReaderLoop
 {
-	const int SIZE_FULL_FRAME = 8;
+	const int SIZE_FULL_FRAME = 6;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	unsigned char downlinkFrame[255];
 	unsigned char buffer[255];
-	unsigned char frameIndex = 0;
+	unsigned char downlinkFrameIndex = 0;
 	unsigned char numBytesRead;
 	
 	while (![[NSThread currentThread] isCancelled] && serialWriteFileDescriptor != -1)
@@ -86,62 +86,58 @@ void scoot(unsigned char* buffer, unsigned char* index)
 		// Get new bytes
 		numBytesRead = read_downlink(serialWriteFileDescriptor, buffer);
 		
-#if defined(PRINTRX)
+#if PRINTRX
 		
 		for(int i=0; i<numBytesRead; i++)
 		{
 			printf("%c", buffer[i]);
 		}
-		usleep(100);
 #else
 		
 		// Append to our downlink frame
-		memcpy(&downlinkFrame[frameIndex], buffer, numBytesRead);
-		frameIndex += numBytesRead;
+		memcpy(&downlinkFrame[downlinkFrameIndex], buffer, numBytesRead);
+		downlinkFrameIndex += numBytesRead;
 		
-		scoot(downlinkFrame, &frameIndex);
+		scoot(downlinkFrame, &downlinkFrameIndex);
 		
-		
-
-//		// Discard bytes until a header is found
-//		for(int i=0; i+1<frameIndex; i++)  // i+1 is needed as the header is 2 bytes
-//		{
-//			if (downlinkFrame[i]==0xef && downlinkFrame[i+1]==0xbe) 
-//			{
-//				if (i != 0)  // Frame header not at start of frame
-//				{
-//					// Move from header ownwards to start of frame
-//					memcpy(downlinkFrame, &downlinkFrame[i], frameIndex-i);
-//					
-//					// Adjust the index
-//					frameIndex -= i;
-//				}
-//				
-//				// Done here, header at start of frame
-//				break;
-//			}
-//		}
-		
-
-		// Full frame? Check CRC and handle accordingly
-		if (frameIndex >= SIZE_FULL_FRAME-1) 
+		// Handle all packets in buffer
+		while (downlinkFrameIndex >= SIZE_FULL_FRAME) 
 		{
-			// TODO: implement, but for now just show what we got:
-			//int i;
-			//printf("\n Downlink Frame Contents: ");
-			//for(i=0; i<SIZE_FULL_FRAME; i++)
-			//{
-//				printf("%x", downlinkFrame[i]);
-//			}
-			//printf("\n");
-			// Reset frame index pointer
-			frameIndex = 0;
-			//framePtr = &downlinkFrame[0];
+			// Check if packet is good
+			if (crc16_verify(downlinkFrame, SIZE_FULL_FRAME)) 
+			{
+				// Handle Packet
+				unsigned char *ptr = downlinkFrame;
+				
+				// Skip Header
+				ptr += 2;
+				
+				// Grab the reported uplink crc errors
+				memcpy(&uplinkCrcErrors, ptr, sizeof(uplinkCrcErrors));
+				ptr += sizeof(uplinkCrcErrors);
+				
+				// Remove the handled frame
+				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
+				downlinkFrameIndex -= SIZE_FULL_FRAME;
+			}
+			else 
+			{
+				// TODO: increment some counter
+				
+				NSLog(@"Downlink bad CRC (below)");
+				
+				for(int i=0; i<SIZE_FULL_FRAME; i++)
+				{
+						printf("%.2X ", downlinkFrame[i]);
+				}
+				
+				// Remove the bad frame
+				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
+				downlinkFrameIndex -= SIZE_FULL_FRAME;
+			}
+
 		}
-		else 
-		{
-			NSLog(@"Incomplete - Total bytes so far: %d", frameIndex);
-		}
+
 		
 #endif
 	}
@@ -155,6 +151,26 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	
 	calculatedPulsePitch = 1500;
 	calculatedPulseHeading = 1500;
+	
+	unsigned char testBuffer[] = {0xEF, 0xBE, 0x00, 0x00, 0xbf, 0x40};
+	uint16_t crc = 0xffff;
+	crc = crc16_update(crc, 0x00);
+	crc = crc16_update(crc, 0x00);
+	
+	NSLog(@"crc single call resulted in:  %hu", crc);
+	
+	crc = crc16_array_update(&testBuffer[2], 2);
+	
+	NSLog(@"crc arra call resulted in:  %hu", crc);
+	
+	if (crc16_verify(testBuffer, 6)) {
+		NSLog(@"it verifies");
+	}
+	else {
+		NSLog(@"it dont verify");
+	}
+
+	
 }
 
 - (IBAction)startReadingSensorData:(id)sender

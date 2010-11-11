@@ -11,7 +11,7 @@
 
 uint16_t crc16_update(uint16_t crc, uint8_t array);
 
-uint16_t crc16_array_update(uint8_t array, uint8_t length);
+uint16_t crc16_array_update(const void* array, uint8_t length);
 
 char crc16_verify(void* array, uint8_t length);
 

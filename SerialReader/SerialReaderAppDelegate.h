@@ -35,6 +35,8 @@
 	IBOutlet NSTextField *downlinkPacketCrcReportLabel;
 	IBOutlet NSTextField *downlinkPacketCrcLabel;
 	
+	unsigned short uplinkCrcErrors;
+	
 }
 
 @property (assign) IBOutlet NSWindow *window;
