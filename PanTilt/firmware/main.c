@@ -55,7 +55,6 @@ uint16_t crc16_array_update(uint8_t array, uint8_t length)
 char crc16_verify(void* array, uint8_t length);
 char crc16_verify(void* array, uint8_t length)
 {
-	uint16_t crc = 0xffff;
 	
 	uint8_t *ptr = (uint8_t *)array;
 	
@@ -64,9 +63,9 @@ char crc16_verify(void* array, uint8_t length)
 	
 	length-=4; // TODO: define CRC_SIZE somewhere, and include
 	
-	crc = crc16_array_update(*ptr, length);
+	uint16_t crc = crc16_array_update(*ptr, length);
 	
-	uint16_t packet_crc;
+	uint16_t packet_crc=0x0000;
 	memcpy(&packet_crc, ptr+length, 2);  // length=length of payload
 	
 	if (crc!=packet_crc) {

@@ -89,7 +89,7 @@ int open_uplink_downlink_port(void)
 	
 }
 
-void write_uplink(int fd, unsigned char *data, int length)
+void write_uplink(int fd, const void *data, int length)
 {
 	if (fd!=0)
 	{

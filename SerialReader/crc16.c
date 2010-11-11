@@ -51,8 +51,15 @@ char crc16_verify(void* array, uint8_t length)
 	
 	crc = crc16_array_update(*ptr, length);
 	
-	uint16_t packet_crc;
+	uint16_t packet_crc = 0;
 	memcpy(&packet_crc, ptr+length, 2);  // length=length of payload
+	
+	if(crc!=packet_crc)
+	{
+		printf("**********PROBLEM**************");
+	}
+
+
 	
 	return crc == packet_crc;
 }

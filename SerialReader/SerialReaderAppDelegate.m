@@ -246,13 +246,12 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	memcpy(&buffer[offset], &servoPulsePitch, sizeof(short));
 	offset += sizeof(short);
 	
-	uint16_t crc = 0xffff;
-	crc = crc16_array_update(buffer[2], PAYLOAD_SIZE_HEADTRACKER);
+	uint16_t crc = crc16_array_update(buffer[2], PAYLOAD_SIZE_HEADTRACKER);
 	
 	// Append the crc to the end of the packet
 	memcpy(&buffer[PACKET_SIZE_HEADTRACKER-2], &crc, sizeof(crc));
 	
-	NSString *bytesAsString = [[NSString alloc] init];// = [NSString stringWithString:@"Uplink: "];
+	NSString *bytesAsString = [[[NSString alloc] init] autorelease];
 	
 	for(int i=0; i< PACKET_SIZE_HEADTRACKER; i++)
 	{
@@ -261,7 +260,12 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	
 	// Set GUI Uplink Frame Label
 	[uplinkpacketFrameLabel setStringValue:bytesAsString];
-
+	[uplinkPacketCrcLabel setIntValue:crc];
+	
+	crc16_verify(buffer, PACKET_SIZE_HEADTRACKER);
+	//NSLog(@"Tx %@", bytesAsString);
+	
+	//unsigned char testbuffer[PACKET_SIZE_HEADTRACKER] = {0xEF, 0xBE, 0x25, 0x05, 0x01, 0x00, 0xF1, 0x0D};
 	// Send the Packet
 	write_uplink(serialWriteFileDescriptor, buffer, PACKET_SIZE_HEADTRACKER);
 }

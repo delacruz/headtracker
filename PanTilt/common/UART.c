@@ -219,7 +219,6 @@ int UART0_GetChar( void )
     ch = CBUF_Pop( gUart0RxBuf );
 
 #if CFG_UART0_CR_TO_LF
-
     // The following allows this to be used with fgets
 
     if ( ch == '\r' )
