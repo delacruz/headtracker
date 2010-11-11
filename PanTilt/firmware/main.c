@@ -69,6 +69,10 @@ char crc16_verify(void* array, uint8_t length)
 	uint16_t packet_crc;
 	memcpy(&packet_crc, ptr+length, 2);  // length=length of payload
 	
+	if (crc!=packet_crc) {
+		printf("Expected CRC %hu but got %hu", crc, packet_crc);
+	}
+	
 	return crc == packet_crc;
 }
 
@@ -148,6 +152,14 @@ int main(void)
 				}
 				else 
 				{
+					printf("\nBad CRC, for packet: ");
+					int i;
+					for (i=0; i<uplinkFrameIndex; i++) 
+					{
+						printf("%.2X ", uplinkFrame[i]);
+					}
+					
+					
 					// Update crc error counter
 					crcErrorsUplink++;
 					
