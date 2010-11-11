@@ -209,7 +209,13 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	else if(calculatedPulseHeading<1000) calculatedPulseHeading = 1000;
 	
 	// Round the actual servo pulse width
-	short servoPulseHeading = (short)calculatedPulseHeading;
+	unsigned short servoPulseHeading = (short)calculatedPulseHeading;
+	
+	[headingPulseLabel setIntegerValue:servoPulseHeading];
+	NSNumberFormatter *floatFieldFormatter = [[[NSNumberFormatter alloc]init]autorelease];
+	[floatFieldFormatter setFormat:@"##0.0"];
+	[headingLabel setFormatter:floatFieldFormatter];
+	[headingLabel setFloatValue:heading];
 
 	prevHeading = heading;
 
@@ -218,7 +224,9 @@ void scoot(unsigned char* buffer, unsigned char* index)
 #pragma mark Pitch Pulse Calculation
 	
 	// TODO: calculate pitch
-	short servoPulsePitch = 0xC0DE;
+	unsigned short servoPulsePitch = 0x0001;
+	
+	[pitchPulseLabel setIntValue:servoPulsePitch];
 	
 #pragma mark Build and Send Uplink Packet
 
@@ -244,23 +252,17 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	// Append the crc to the end of the packet
 	memcpy(&buffer[PACKET_SIZE_HEADTRACKER-2], &crc, sizeof(crc));
 	
-	NSString *bytesAsString = [NSString stringWithString:@"Uplink: "];
+	NSString *bytesAsString = [[NSString alloc] init];// = [NSString stringWithString:@"Uplink: "];
 	
 	for(int i=0; i< PACKET_SIZE_HEADTRACKER; i++)
 	{
-		bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2x ",buffer[i]];
+		bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ",buffer[i]];
 	}
 	
-	bytesAsString = [bytesAsString stringByAppendingFormat:@" crc = %.hu ",crc];
-	
-	NSLog(@"%@", bytesAsString);
-	
-	crc16_verify(buffer, PACKET_SIZE_HEADTRACKER);
-	
-	//NSData *myData = [NSData dataWithBytes:buffer length:offset];
+	// Set GUI Uplink Frame Label
+	[uplinkpacketFrameLabel setStringValue:bytesAsString];
 
-	//NSLog(@"offset: %d short size: %d byte: %@ \n",offset,1,myData);
-
+	// Send the Packet
 	write_uplink(serialWriteFileDescriptor, buffer, PACKET_SIZE_HEADTRACKER);
 }
 

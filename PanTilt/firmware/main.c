@@ -112,7 +112,7 @@ int main(void)
 //			}
 			
 			scoot(uplinkFrame, &uplinkFrameIndex);
-			
+//			
 //			printf("\n After Scoot: ");
 //			
 //			for (i=0; i<uplinkFrameIndex; i++) 
@@ -127,14 +127,20 @@ int main(void)
 				if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
 				{
 					// Handle Packet
-					uint16_t *ptr = (uint16_t*)uplinkFrame;
+					uint8_t *ptr = (uint8_t*)uplinkFrame;
+					
+					// Skip Header
+					ptr+=2;
+					
+					// Grab pan servo pulse
 					memcpy(&panServoPulse, ptr, sizeof(panServoPulse));
 					ptr += sizeof(panServoPulse);
 					
+					// Grab tilt servo pulse
 					memcpy(&tiltServoPulse, ptr, sizeof(tiltServoPulse));
 					ptr += sizeof(tiltServoPulse);
 					
-					printf("\nPan Servo Pulse: %d\tTilt Servo Pulse: %d", panServoPulse, tiltServoPulse);
+					//printf("\nPan Servo Pulse: %hu\tTilt Servo Pulse: %hu", panServoPulse, tiltServoPulse);
 					
 					// Pop the packet
 					memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
@@ -189,7 +195,7 @@ int main(void)
 //				crc = _crc16_update(crc, testBuffer[i]);
 //			}
 			
-			printf("\nCRC BAD COUNT: %d", crcErrorsUplink);
+			printf("\nCRC BAD COUNT: %hu", crcErrorsUplink);
 			
 			uint16_t header = 0xbeef;
 			
@@ -205,7 +211,7 @@ int main(void)
 			memcpy(uplinkReportFrame, &crcUplinkReport, sizeof(crcUplinkReport));
 			uplinkReportFrameIndex += sizeof(crcUplinkReport);
 			
-			UART0_Write(uplinkReportFrame, UPLINK_REPORT_PACKET_SIZE);
+			//UART0_Write(uplinkReportFrame, UPLINK_REPORT_PACKET_SIZE);
 
 		}
 		

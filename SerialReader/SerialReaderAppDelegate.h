@@ -12,7 +12,6 @@
 @interface SerialReaderAppDelegate : NSObject <NSApplicationDelegate> {
     NSWindow *window;
 	float heading, pitch, roll;
-	//sensor_data_struct sensorData;
 	float prevHeading, prevPitch, prevRoll;
 	IBOutlet NSTextField *headingLabel;
 	IBOutlet NSTextField *pitchLabel;
@@ -27,6 +26,15 @@
 	NSThread *readerThread;
 	NSThread *downlinkThread;
 	IBOutlet SensorView *theSensorView;
+	
+	IBOutlet NSTextField *headingPulseLabel;
+	IBOutlet NSTextField *pitchPulseLabel;
+	IBOutlet NSTextField *uplinkpacketFrameLabel;
+	IBOutlet NSTextField *uplinkPacketCrcLabel;
+	IBOutlet NSTextField *downlinkPacketFrameLabel;
+	IBOutlet NSTextField *downlinkPacketCrcReportLabel;
+	IBOutlet NSTextField *downlinkPacketCrcLabel;
+	
 }
 
 @property (assign) IBOutlet NSWindow *window;
