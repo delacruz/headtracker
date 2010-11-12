@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="372"/>
+			<integer value="717"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -3250,6 +3250,38 @@
 					</object>
 					<int key="connectionID">768</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">servoCalibrationChanged:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="607477430"/>
+					</object>
+					<int key="connectionID">769</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">servoCalibrationChanged:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="507222869"/>
+					</object>
+					<int key="connectionID">770</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">servoCalibrationChanged:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="492132982"/>
+					</object>
+					<int key="connectionID">771</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">servoCalibrationChanged:</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="871375605"/>
+					</object>
+					<int key="connectionID">772</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -5620,7 +5652,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">768</int>
+			<int key="maxID">772</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5652,11 +5684,13 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>sendBadByte:</string>
+							<string>servoCalibrationChanged:</string>
 							<string>startReadingSensorData:</string>
 							<string>stopReadingSensorData:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -5667,6 +5701,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>sendBadByte:</string>
+							<string>servoCalibrationChanged:</string>
 							<string>startReadingSensorData:</string>
 							<string>stopReadingSensorData:</string>
 						</object>
@@ -5674,6 +5709,10 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<object class="IBActionInfo">
 								<string key="name">sendBadByte:</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
+								<string key="name">servoCalibrationChanged:</string>
 								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">

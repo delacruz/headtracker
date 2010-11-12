@@ -15,9 +15,25 @@
 #define PAYLOAD_SIZE_HEADTRACKER 4
 #define PACKET_SIZE_HEADTRACKER HEADER_SIZE + PAYLOAD_SIZE_HEADTRACKER + CRC_SIZE
 
+NSString * const KeyServoPulseMinPan = @"PanServoMinPulse";
+NSString * const KeyServoPulseMaxPan = @"PanServoMaxPulse";
+NSString * const KeyServoPulseMinTilt = @"TiltServoMinPulse";
+NSString * const KeyServoPulseMaxTilt = @"TiltServoMaxPulse";
+
 @implementation SerialReaderAppDelegate
 
 @synthesize window;
+
++ (void)initialize
+{
+	NSMutableDictionary *defaultValues = [NSMutableDictionary dictionary];
+	[defaultValues setObject:[NSNumber numberWithInt:1000] forKey:KeyServoPulseMinPan];
+	[defaultValues setObject:[NSNumber numberWithInt:2000] forKey:KeyServoPulseMaxPan];
+	[defaultValues setObject:[NSNumber numberWithInt:1000] forKey:KeyServoPulseMinTilt];
+	[defaultValues setObject:[NSNumber numberWithInt:2000] forKey:KeyServoPulseMaxTilt];
+	[[NSUserDefaults standardUserDefaults] registerDefaults:defaultValues];
+	NSLog(@"Default values registered.");
+}
 
 + (int)openPort
 {
@@ -187,13 +203,11 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	[self willChangeValueForKey:@"servoPulseMinTilt"];
 	[self willChangeValueForKey:@"servoPulseMaxTilt"];
 	
-	// TODO: Save values on exit
-	servoPulseMinPan = 1000;
-	servoPulseMaxPan = 2000;
-	
-	// TODO: Save values on exit
-	servoPulseMinTilt = 1000;
-	servoPulseMaxTilt = 2000;
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	servoPulseMinPan = [defaults integerForKey:KeyServoPulseMinPan];
+	servoPulseMaxPan = [defaults integerForKey:KeyServoPulseMaxPan];
+	servoPulseMinTilt = [defaults integerForKey:KeyServoPulseMinTilt];
+	servoPulseMaxTilt = [defaults integerForKey:KeyServoPulseMaxTilt];
 	
 	[self didChangeValueForKey:@"servoPulseMinPan"];
 	[self didChangeValueForKey:@"servoPulseMaxPan"];
@@ -380,6 +394,15 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	{
 		write_uplink(serialWriteFileDescriptor, uplinkPacket, PACKET_SIZE_HEADTRACKER);
 	}
+}
+
+- (IBAction)servoCalibrationChanged:(id)sender
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	[defaults setInteger:servoPulseMinPan forKey:KeyServoPulseMinPan];
+	[defaults setInteger:servoPulseMaxPan forKey:KeyServoPulseMaxPan];
+	[defaults setInteger:servoPulseMinTilt forKey:KeyServoPulseMinTilt];
+	[defaults setInteger:servoPulseMaxTilt forKey:KeyServoPulseMaxTilt];
 }
 
 @end

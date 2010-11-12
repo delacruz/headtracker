@@ -49,5 +49,6 @@
 - (IBAction)startReadingSensorData:(id)sender;
 - (IBAction)stopReadingSensorData:(id)sender;
 - (IBAction)sendBadByte:(id)sender;
+- (IBAction)servoCalibrationChanged:(id)sender;
 
 @end
