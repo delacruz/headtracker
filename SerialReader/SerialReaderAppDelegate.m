@@ -152,7 +152,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	calculatedPulsePitch = 1500;
 	calculatedPulseHeading = 1500;
 	
-	unsigned char testBuffer[] = {0xEF, 0xBE, 0x00, 0x00, 0xbf, 0x40};
+	unsigned char testBuffer[] = {0xEF, 0xBE, 0x00, 0x00, 0x01, 0xb0};
 	uint16_t crc = 0xffff;
 	crc = crc16_update(crc, 0x00);
 	crc = crc16_update(crc, 0x00);
@@ -262,7 +262,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	memcpy(&buffer[offset], &servoPulsePitch, sizeof(short));
 	offset += sizeof(short);
 	
-	uint16_t crc = crc16_array_update(buffer[2], PAYLOAD_SIZE_HEADTRACKER);
+	uint16_t crc = crc16_array_update(&buffer[2], PAYLOAD_SIZE_HEADTRACKER);
 	
 	// Append the crc to the end of the packet
 	memcpy(&buffer[PACKET_SIZE_HEADTRACKER-2], &crc, sizeof(crc));
