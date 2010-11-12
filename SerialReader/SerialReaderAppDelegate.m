@@ -106,6 +106,14 @@ void scoot(unsigned char* buffer, unsigned char* index)
 			// Check if packet is good
 			if (crc16_verify(downlinkFrame, SIZE_FULL_FRAME)) 
 			{
+				// Update GUI
+				NSString *bytesAsString = [[[NSString alloc] init] autorelease];
+				for(int i=0; i<SIZE_FULL_FRAME; i++)
+				{
+					bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ", downlinkFrame[i]];
+				}
+				[downlinkPacketFrameLabel setStringValue:bytesAsString];
+				
 				// Handle Packet
 				unsigned char *ptr = downlinkFrame;
 				
@@ -113,8 +121,15 @@ void scoot(unsigned char* buffer, unsigned char* index)
 				ptr += 2;
 				
 				// Grab the reported uplink crc errors
-				memcpy(&uplinkCrcErrors, ptr, sizeof(uplinkCrcErrors));
-				ptr += sizeof(uplinkCrcErrors);
+				unsigned short uplinkCrcErrorCount;
+				memcpy(&uplinkCrcErrorCount, ptr, sizeof(uplinkCrcErrorCount));
+				ptr += sizeof(uplinkCrcErrorCount);
+				[downlinkPacketCrcReportLabel setIntValue:uplinkCrcErrorCount];
+				
+				unsigned short packetCrc;
+				memcpy(&packetCrc, ptr, sizeof(packetCrc));
+				ptr+=sizeof(packetCrc);
+				[downlinkPacketCrcLabel setIntValue:packetCrc];
 				
 				// Remove the handled frame
 				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
@@ -152,23 +167,23 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	calculatedPulsePitch = 1500;
 	calculatedPulseHeading = 1500;
 	
-	unsigned char testBuffer[] = {0xEF, 0xBE, 0x00, 0x00, 0x01, 0xb0};
-	uint16_t crc = 0xffff;
-	crc = crc16_update(crc, 0x00);
-	crc = crc16_update(crc, 0x00);
-	
-	NSLog(@"crc single call resulted in:  %hu", crc);
-	
-	crc = crc16_array_update(&testBuffer[2], 2);
-	
-	NSLog(@"crc arra call resulted in:  %hu", crc);
-	
-	if (crc16_verify(testBuffer, 6)) {
-		NSLog(@"it verifies");
-	}
-	else {
-		NSLog(@"it dont verify");
-	}
+//	unsigned char testBuffer[] = {0xEF, 0xBE, 0x06, 0x09, 0x01, 0xb0};
+//	uint16_t crc = 0xffff;
+//	crc = crc16_update(crc, 0x06);
+//	crc = crc16_update(crc, 0x09);
+//	
+//	NSLog(@"crc single call resulted in:  %hu", crc);
+//	
+//	crc = crc16_array_update(&testBuffer[2], 2);
+//	
+//	NSLog(@"crc arra call resulted in:  %hu", crc);
+//	
+//	if (crc16_verify(testBuffer, 6)) {
+//		NSLog(@"it verifies");
+//	}
+//	else {
+//		NSLog(@"it dont verify");
+//	}
 
 	
 }
@@ -221,8 +236,8 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	calculatedPulseHeading += deltaFloat;
 	
 	// Limit the servo pwm range
-	if(calculatedPulseHeading>2000) calculatedPulseHeading = 2000;
-	else if(calculatedPulseHeading<1000) calculatedPulseHeading = 1000;
+	if(calculatedPulseHeading > 2000) calculatedPulseHeading = 2000;
+	else if(calculatedPulseHeading < 1000) calculatedPulseHeading = 1000;
 	
 	// Round the actual servo pulse width
 	unsigned short servoPulseHeading = (short)calculatedPulseHeading;

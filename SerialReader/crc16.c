@@ -28,7 +28,7 @@ uint16_t crc16_update(uint16_t crc, uint8_t a)
 
 uint16_t crc16_array_update(const void* array, uint8_t length)
 {
-	const uint8_t *ptr = (uint8_t*)array;
+	const uint8_t *ptr = (const uint8_t*)array;
 	uint16_t crc = 0xffff;
 	while (length>0)
 	{
@@ -43,11 +43,12 @@ char crc16_verify(const void* array, uint8_t length)
 {
 	uint16_t crc = 0xffff;
 	
-	const uint8_t *ptr = (uint8_t *)array;
+	const uint8_t *ptr = (const uint8_t *)array;
 	
 	// Skip header
-	*ptr++; 
-	*ptr++; // TODO: define HEADER_SIZE somewhere, and include
+	ptr+=2;
+	
+	// TODO: define HEADER_SIZE somewhere, and include
 	
 	length-=4; // TODO: define CRC_SIZE somewhere, and include
 	
@@ -55,10 +56,6 @@ char crc16_verify(const void* array, uint8_t length)
 	
 	uint16_t packet_crc = 0;
 	memcpy(&packet_crc, ptr+length, 2);  // length=length of payload
-	
-	if (crc!=packet_crc) {
-		printf("\nBAD CRC: expected %hu, but got %hu\n", crc, packet_crc);
-	}
 	
 	return crc == packet_crc;
 }

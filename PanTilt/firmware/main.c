@@ -42,7 +42,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 uint16_t crc16_array_update(const void* array, uint8_t length);
 uint16_t crc16_array_update(const void* array, uint8_t length)
 {
-	const uint8_t *ptr = (uint8_t*)array;
+	const uint8_t *ptr = (const uint8_t*)array;
 	uint16_t crc = 0xffff;
 	while (length>0)
 	{
@@ -53,25 +53,22 @@ uint16_t crc16_array_update(const void* array, uint8_t length)
 	return crc;
 }
 
-char crc16_verify(void* array, uint8_t length);
-char crc16_verify(void* array, uint8_t length)
+char crc16_verify(const void* array, uint8_t length);
+char crc16_verify(const void* array, uint8_t length)
 {
+	uint16_t crc = 0xffff;
 	
-	uint8_t *ptr = (uint8_t *)array;
+	const uint8_t *ptr = (const uint8_t *)array;
 	
 	// Skip header
-	ptr+=2;  // TODO: define HEADER_SIZE somewhere, and include
+	ptr+=2;// TODO: define HEADER_SIZE somewhere, and include
 	
 	length-=4; // TODO: define CRC_SIZE somewhere, and include
 	
-	uint16_t crc = crc16_array_update(*ptr, length);
+	crc = crc16_array_update(ptr, length);
 	
-	uint16_t packet_crc=0x0000;
+	uint16_t packet_crc = 0;
 	memcpy(&packet_crc, ptr+length, 2);  // length=length of payload
-	
-	if (crc!=packet_crc) {
-		printf("Expected CRC %hu but got %hu", crc, packet_crc);
-	}
 	
 	return crc == packet_crc;
 }
@@ -204,7 +201,7 @@ int main(void)
 			uplinkReportFrameIndex += sizeof(crcErrorCountUplink);
 			
 			uint16_t crc = 0xffff;
-			crc = _crc16_update(crc, crcErrorCountUplink);
+			crc = crc16_array_update(&uplinkReportFrame[2], 2);//_crc16_update(crc, crcErrorCountUplink);
 			
 			memcpy(&uplinkReportFrame[uplinkReportFrameIndex], &crc, sizeof(crc));
 			uplinkReportFrameIndex += sizeof(crc);
