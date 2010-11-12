@@ -34,9 +34,12 @@ void scoot(unsigned char* buffer, unsigned char* index)
 			}
 			
 			// Done here, header at start of frame
-			break;
+			return;
 		}
 	}
+	
+	// No header found, set index to 0
+	*index = 0;
 }
 
 uint16_t crc16_array_update(const void* array, uint8_t length);
@@ -83,6 +86,8 @@ int main(void)
 	unsigned char uplinkReportFrameIndex=0;
 	uint16_t panServoPulse = 1500;
 	uint16_t tiltServoPulse = 1500;
+	char newStuff = 0;
+	char badHappened = 0;
 	
 	uint16_t crcErrorCountUplink = 0;
 	
@@ -94,98 +99,118 @@ int main(void)
 	
     while(1)
 	{
-		
-		int newStuff = 0;
-		
 		while(UART0_IsCharAvailable())
 		{
 			uplinkFrame[uplinkFrameIndex++] = UART0_GetChar();
-			newStuff = 1;
+			
 		}
 		
-		if (newStuff==1) // TODO: NOT NECESSARY?!  REMOVE
+
+		// Handle all available packets in Rx buffer
+		while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
 		{
-//			printf("\n Before Scoot: ");
-//			int i;
-//			for (i=0; i<uplinkFrameIndex; i++) 
-//			{
-//				printf("%.2X ", uplinkFrame[i]);
-//			}
-			
-			scoot(uplinkFrame, &uplinkFrameIndex);
-//			
-//			printf("\n After Scoot: ");
-//			
-//			for (i=0; i<uplinkFrameIndex; i++) 
-//			{
-//				printf("%.2X ", uplinkFrame[i]);
-//			}
-			
-			// Handle all available packets in Rx buffer
-			while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
+			newStuff = 1;
+			//printf("\nmore than one packet!\n");
+			if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
 			{
-				//printf("\nmore than one packet!\n");
-				if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
-				{
-					// Handle Packet
-					uint8_t *ptr = (uint8_t*)uplinkFrame;
-					
-					// Skip Header
-					ptr+=2;
-					
-					// Grab pan servo pulse
-					memcpy(&panServoPulse, ptr, sizeof(panServoPulse));
-					ptr += sizeof(panServoPulse);
-					
-					// Grab tilt servo pulse
-					memcpy(&tiltServoPulse, ptr, sizeof(tiltServoPulse));
-					ptr += sizeof(tiltServoPulse);
-					
-					//printf("\nPan Servo Pulse: %hu\tTilt Servo Pulse: %hu", panServoPulse, tiltServoPulse);
-					
-					// Pop the packet
-					memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
-					uplinkFrameIndex-=UPLINK_PACKET_SIZE;
-				}
-				else 
-				{
-//					printf("\nBad CRC, for packet: ");
-//					int i;
-//					for (i=0; i<uplinkFrameIndex; i++) 
-//					{
-//						printf("%.2X ", uplinkFrame[i]);
-//					}
-//					
-					
-					// Update crc error counter
-					crcErrorCountUplink++;
-					
-					// Pop the packet
-					memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
-					uplinkFrameIndex-=UPLINK_PACKET_SIZE;
-				}
+				// Handle Packet
+				uint8_t *ptr = (uint8_t*)uplinkFrame;
 				
-				newStuff=0;
+				// Skip Header
+				ptr+=2;
 				
-				LED_TOGGLE(BLUE);
-
+				// Grab pan servo pulse
+				memcpy(&panServoPulse, ptr, sizeof(panServoPulse));
+				ptr += sizeof(panServoPulse);
+				
+				// Grab tilt servo pulse
+				memcpy(&tiltServoPulse, ptr, sizeof(tiltServoPulse));
+				ptr += sizeof(tiltServoPulse);
+				
+				//printf("\nPan Servo Pulse: %hu\tTilt Servo Pulse: %hu", panServoPulse, tiltServoPulse);
+				
+				// Pop the packet
+				memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
+				uplinkFrameIndex-=UPLINK_PACKET_SIZE;
 			}
+			else 
+			{
+//				printf("\nBad CRC, for packet: ");
+//				int i;
+//				for (i=0; i<uplinkFrameIndex; i++) 
+//				{
+//					printf("%.2X ", uplinkFrame[i]);
+//				}
+//				
+				
+				// Update crc error counter
+				crcErrorCountUplink++;
+				badHappened = 1;
+				
+				// Chop off head
+				memcpy(uplinkFrame, &uplinkFrame[2], uplinkFrameIndex-2);
+				uplinkFrameIndex-=2;
+				
+//				printf("\nChopped head, now have: ");
+//				for (i=0; i<uplinkFrameIndex; i++) 
+//				{
+//					printf("%.2X ", uplinkFrame[i]);
+//				}
+				
+				// Trim bad bytes til next header
+				scoot(uplinkFrame, &uplinkFrameIndex);
+				
+//				printf("\nNow trimmed: ");
+//				for (i=0; i<uplinkFrameIndex; i++) 
+//				{
+//					printf("%.2X ", uplinkFrame[i]);
+//				}
+//				printf("\nTotal crc bad: %d", crcErrorCountUplink);
+			}
+				
 
+
+		}
+		
+		if(gTickCount%2==0) // 50Hz
+		{
+			
+			if (newStuff) 
+			{
+				LED_ON(BLUE);
+				newStuff=0;
+			}
+			else 
+			{
+				LED_OFF(BLUE);
+			}
+			
 		}
 	
 		if(gTickCount%5==0)  // 20Hz
 		{
+
 
 		}
 		
 		if(gTickCount%10==0) // 10Hz
 		{
 
+
+
 		}
 		
 		if(gTickCount%20==0) // 5Hz
 		{
-
+			if (badHappened) 
+			{
+				LED_ON(RED);
+				badHappened = 0;
+			}
+			else 
+			{
+				LED_OFF(RED);
+			}
 		}
 		
 		if(gTickCount%50==0) // 2Hz
@@ -207,8 +232,11 @@ int main(void)
 			uplinkReportFrameIndex += sizeof(crc);
 			
 			UART0_Write(uplinkReportFrame, UPLINK_REPORT_PACKET_SIZE);
-
+			
+			LED_TOGGLE(YELLOW);
 		}
+		
+
 		
 		WaitForTimer0Rollover();
     }

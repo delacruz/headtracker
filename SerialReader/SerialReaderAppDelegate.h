@@ -35,11 +35,13 @@
 	IBOutlet NSTextField *downlinkPacketCrcReportLabel;
 	IBOutlet NSTextField *downlinkPacketCrcLabel;
 	
+	
 }
 
 @property (assign) IBOutlet NSWindow *window;
 
 - (IBAction)startReadingSensorData:(id)sender;
 - (IBAction)stopReadingSensorData:(id)sender;
+- (IBAction)sendBadByte:(id)sender;
 
 @end

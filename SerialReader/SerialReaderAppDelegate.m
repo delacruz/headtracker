@@ -65,9 +65,12 @@ void scoot(unsigned char* buffer, unsigned char* index)
 			}
 			
 			// Done here, header at start of frame
-			break;
+			return;
 		}
 	}
+	
+	// No header found, set index to 0
+	*index = 0;
 }
 
 #define PRINTRX 0
@@ -146,9 +149,10 @@ void scoot(unsigned char* buffer, unsigned char* index)
 						printf("%.2X ", downlinkFrame[i]);
 				}
 				
-				// Remove the bad frame
-				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
-				downlinkFrameIndex -= SIZE_FULL_FRAME;
+				// Chop head
+				memcpy(downlinkFrame, &downlinkFrame[2], downlinkFrameIndex-2);
+				downlinkFrameIndex -= 2;
+				scoot(downlinkFrame, &downlinkFrameIndex);
 			}
 
 		}
@@ -301,6 +305,11 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	write_uplink(serialWriteFileDescriptor, buffer, PACKET_SIZE_HEADTRACKER);
 }
 
+- (IBAction)sendBadByte:(id)sender
+{
+	unsigned char badness[] = {0xff};
+	write_uplink(serialWriteFileDescriptor, badness, 1);
+}
 
 
 @end
