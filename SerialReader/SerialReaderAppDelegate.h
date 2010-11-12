@@ -35,7 +35,13 @@
 	IBOutlet NSTextField *downlinkPacketCrcReportLabel;
 	IBOutlet NSTextField *downlinkPacketCrcLabel;
 	
+	NSTimer *uplinkTimer;
 	
+	unsigned char uplinkPacket[8];
+	NSLock *lockUplinkPacket;
+	
+	int servoPulseMinPan, servoPulseMaxPan;
+	int servoPulseMinTilt, servoPulseMaxTilt;
 }
 
 @property (assign) IBOutlet NSWindow *window;

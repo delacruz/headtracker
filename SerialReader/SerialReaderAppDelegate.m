@@ -40,9 +40,12 @@
 	while (![[NSThread currentThread] isCancelled] && serialReadFileDescriptor != -1)
 	{
 		[self willChangeValueForKey:@"heading"];
+		[self willChangeValueForKey:@"pitch"];
+		[self willChangeValueForKey:@"roll"];
 		read_sensor_port(serialReadFileDescriptor, &heading, &pitch, &roll);
 		[self didChangeValueForKey:@"heading"];
-		
+		[self didChangeValueForKey:@"pitch"];
+		[self didChangeValueForKey:@"roll"];
 	}
 	[pool drain];
 }
@@ -167,9 +170,40 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	
 	// TODO: Add observer to only one struct, not three vars, easier to observe.
 	[self addObserver:self forKeyPath:@"heading" options:NSKeyValueObservingOptionOld context:nil];
+	[self addObserver:self forKeyPath:@"pitch" options:NSKeyValueObservingOptionOld context:nil];
+	[self addObserver:self forKeyPath:@"roll" options:NSKeyValueObservingOptionOld context:nil];
+	
+	NSNumberFormatter *floatFieldFormatter = [[[NSNumberFormatter alloc]init]autorelease];
+	[floatFieldFormatter setFormat:@"##0.0"];
+	[headingLabel setFormatter:floatFieldFormatter];
+	[pitchLabel setFormatter:floatFieldFormatter];
+	[rollLabel setFormatter:floatFieldFormatter];
 	
 	calculatedPulsePitch = 1500;
 	calculatedPulseHeading = 1500;
+	
+	[self willChangeValueForKey:@"servoPulseMinPan"];
+	[self willChangeValueForKey:@"servoPulseMaxPan"];
+	[self willChangeValueForKey:@"servoPulseMinTilt"];
+	[self willChangeValueForKey:@"servoPulseMaxTilt"];
+	
+	// TODO: Save values on exit
+	servoPulseMinPan = 1000;
+	servoPulseMaxPan = 2000;
+	
+	// TODO: Save values on exit
+	servoPulseMinTilt = 1000;
+	servoPulseMaxTilt = 2000;
+	
+	[self didChangeValueForKey:@"servoPulseMinPan"];
+	[self didChangeValueForKey:@"servoPulseMaxPan"];
+	[self didChangeValueForKey:@"servoPulseMinTilt"];
+	[self didChangeValueForKey:@"servoPulseMaxTilt"];
+	
+	lockUplinkPacket = [[NSLock alloc] init]; // TODO: release this on dispose?
+	
+	// Create uplink timer
+	
 	
 //	unsigned char testBuffer[] = {0xEF, 0xBE, 0x06, 0x09, 0x01, 0xb0};
 //	uint16_t crc = 0xffff;
@@ -195,12 +229,22 @@ void scoot(unsigned char* buffer, unsigned char* index)
 - (IBAction)startReadingSensorData:(id)sender
 {
 	serialReadFileDescriptor = [SerialReaderAppDelegate openPort];
-	readerThread = [[NSThread alloc] initWithTarget:self selector:@selector(readerLoop) object:nil];
+	readerThread = [[NSThread alloc] initWithTarget:self 
+										   selector:@selector(readerLoop) 
+											 object:nil];
 	[readerThread start];
 	
 	serialWriteFileDescriptor = [SerialReaderAppDelegate openDownlinkPort];
-	downlinkThread = [[NSThread alloc] initWithTarget:self selector:@selector(downlinkReaderLoop) object:nil];
+	downlinkThread = [[NSThread alloc] initWithTarget:self 
+											 selector:@selector(downlinkReaderLoop) 
+											   object:nil];
 	[downlinkThread start];
+	
+	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.05
+												   target: self
+												 selector: @selector(onUplinkTimer:)
+												 userInfo: nil
+												  repeats: YES];
 	
 }
 
@@ -214,6 +258,10 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	downlinkThread = nil;
 	close_port(serialReadFileDescriptor);
 	close_port(serialWriteFileDescriptor);
+	
+	[uplinkTimer invalidate];
+	[uplinkTimer release];
+	uplinkTimer = nil;
 }
 
 - (void) observeValueForKeyPath:(NSString *)keyPath 
@@ -236,21 +284,19 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	else if(headingDelta < -180.0) headingDelta += 360.0;
 
 	// Calculate the pan servo pulse width
-	float deltaFloat = headingDelta * 1000.0/180.0;
+	float deltaFloat = headingDelta * ((float)(servoPulseMaxPan - servoPulseMinPan)) / 180.0;
 	calculatedPulseHeading += deltaFloat;
 	
-	// Limit the servo pwm range
-	if(calculatedPulseHeading > 2000) calculatedPulseHeading = 2000;
-	else if(calculatedPulseHeading < 1000) calculatedPulseHeading = 1000;
+	// Enforce range limit if reached
+	if(calculatedPulseHeading > servoPulseMaxPan) calculatedPulseHeading = servoPulseMaxPan;
+	else if(calculatedPulseHeading < servoPulseMinPan) calculatedPulseHeading = servoPulseMinPan;
 	
 	// Round the actual servo pulse width
-	unsigned short servoPulseHeading = (short)calculatedPulseHeading;
+	unsigned short servoPulseHeading = (unsigned short)calculatedPulseHeading;
 	
 	[headingPulseLabel setIntegerValue:servoPulseHeading];
-	NSNumberFormatter *floatFieldFormatter = [[[NSNumberFormatter alloc]init]autorelease];
-	[floatFieldFormatter setFormat:@"##0.0"];
-	[headingLabel setFormatter:floatFieldFormatter];
-	[headingLabel setFloatValue:heading];
+	
+//	[headingLabel setFloatValue:heading];
 
 	prevHeading = heading;
 
@@ -258,10 +304,22 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	
 #pragma mark Pitch Pulse Calculation
 	
-	// TODO: calculate pitch
-	unsigned short servoPulsePitch = 0x0001;
+	// Delta
+	float pitchDelta = pitch - prevPitch;
 	
+	// Calculate pulse width
+	calculatedPulsePitch += pitchDelta * ((float)(servoPulseMaxTilt-servoPulseMinTilt)) / 90.0;
+	
+	// Enforce range limit if reached
+	if (calculatedPulsePitch > servoPulseMaxTilt) calculatedPulsePitch = servoPulseMaxTilt;
+	else if (calculatedPulsePitch < servoPulseMinTilt) calculatedPulsePitch = servoPulseMinTilt;
+	
+	unsigned short servoPulsePitch = (unsigned short)calculatedPulsePitch;
+
+//	[pitchLabel setFloatValue: pitch];
 	[pitchPulseLabel setIntValue:servoPulsePitch];
+	
+	prevPitch = pitch;
 	
 #pragma mark Build and Send Uplink Packet
 
@@ -302,7 +360,11 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	
 	//unsigned char testbuffer[PACKET_SIZE_HEADTRACKER] = {0xEF, 0xBE, 0x25, 0x05, 0x01, 0x00, 0xF1, 0x0D};
 	// Send the Packet
-	write_uplink(serialWriteFileDescriptor, buffer, PACKET_SIZE_HEADTRACKER);
+	
+	@synchronized(lockUplinkPacket)
+	{
+		memcpy(uplinkPacket, buffer, PACKET_SIZE_HEADTRACKER);
+	}
 }
 
 - (IBAction)sendBadByte:(id)sender
@@ -311,5 +373,13 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	write_uplink(serialWriteFileDescriptor, badness, 1);
 }
 
+- (void)onUplinkTimer:(NSTimer*)timer
+{
+	NSLog(@"timer tick");
+	@synchronized(lockUplinkPacket)
+	{
+		write_uplink(serialWriteFileDescriptor, uplinkPacket, PACKET_SIZE_HEADTRACKER);
+	}
+}
 
 @end
