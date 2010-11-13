@@ -11,6 +11,7 @@
 #include "UART.h"
 #include <string.h>
 #include <util/crc16.h>
+#include "Servo.h"
 
 #define UPLINK_PACKET_SIZE 8
 #define UPLINK_REPORT_PACKET_SIZE 6
@@ -92,6 +93,7 @@ int main(void)
 	uint16_t crcErrorCountUplink = 0;
 	
 	InitHardware();
+	InitServoTimer(3);
 	
     u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 
@@ -185,6 +187,8 @@ int main(void)
 				LED_OFF(BLUE);
 			}
 			
+			
+			
 		}
 	
 		if(gTickCount%5==0)  // 20Hz
@@ -236,8 +240,10 @@ int main(void)
 			LED_TOGGLE(YELLOW);
 		}
 		
-
-		
+		// Set servos
+		SetServo(SERVO_3A, panServoPulse);
+		SetServo(SERVO_3B, tiltServoPulse);
+	
 		WaitForTimer0Rollover();
     }
     return 0;   /* never reached */

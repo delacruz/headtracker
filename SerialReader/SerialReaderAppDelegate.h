@@ -42,6 +42,11 @@
 	
 	int servoPulseMinPan, servoPulseMaxPan;
 	int servoPulseMinTilt, servoPulseMaxTilt;
+	
+	IBOutlet NSButton *calibrateEnableButton;
+	IBOutlet NSBox *calibrationBoxPanServo;
+	IBOutlet NSBox *calibrationBoxTiltServo;
+	
 }
 
 @property (assign) IBOutlet NSWindow *window;
@@ -50,5 +55,6 @@
 - (IBAction)stopReadingSensorData:(id)sender;
 - (IBAction)sendBadByte:(id)sender;
 - (IBAction)servoCalibrationChanged:(id)sender;
+
 
 @end

@@ -259,6 +259,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 												 selector: @selector(onUplinkTimer:)
 												 userInfo: nil
 												  repeats: YES];
+	[[NSRunLoop currentRunLoop] addTimer:uplinkTimer forMode:NSEventTrackingRunLoopMode];
 	
 }
 
@@ -322,7 +323,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	float pitchDelta = pitch - prevPitch;
 	
 	// Calculate pulse width
-	calculatedPulsePitch += pitchDelta * ((float)(servoPulseMaxTilt-servoPulseMinTilt)) / 90.0;
+	calculatedPulsePitch -= pitchDelta * ((float)(servoPulseMaxTilt-servoPulseMinTilt)) / 90.0;
 	
 	// Enforce range limit if reached
 	if (calculatedPulsePitch > servoPulseMaxTilt) calculatedPulsePitch = servoPulseMaxTilt;
@@ -389,7 +390,6 @@ void scoot(unsigned char* buffer, unsigned char* index)
 
 - (void)onUplinkTimer:(NSTimer*)timer
 {
-	NSLog(@"timer tick");
 	@synchronized(lockUplinkPacket)
 	{
 		write_uplink(serialWriteFileDescriptor, uplinkPacket, PACKET_SIZE_HEADTRACKER);
@@ -403,6 +403,8 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	[defaults setInteger:servoPulseMaxPan forKey:KeyServoPulseMaxPan];
 	[defaults setInteger:servoPulseMinTilt forKey:KeyServoPulseMinTilt];
 	[defaults setInteger:servoPulseMaxTilt forKey:KeyServoPulseMaxTilt];
+	
+	[self observeValueForKeyPath:@"servoPulseMinPan" ofObject:nil change:nil context:nil];
 }
 
 @end

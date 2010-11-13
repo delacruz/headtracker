@@ -2,9 +2,9 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">1060</int>
-		<string key="IBDocument.SystemVersion">10F569</string>
+		<string key="IBDocument.SystemVersion">10H574</string>
 		<string key="IBDocument.InterfaceBuilderVersion">788</string>
-		<string key="IBDocument.AppKitVersion">1038.29</string>
+		<string key="IBDocument.AppKitVersion">1038.35</string>
 		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="717"/>
+			<integer value="687"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1680,7 +1680,7 @@
 										<object class="NSButton" id="30386987">
 											<reference key="NSNextResponder" ref="13502565"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{189, 298}, {103, 28}}</string>
+											<string key="NSFrame">{{194, 304}, {103, 28}}</string>
 											<reference key="NSSuperview" ref="13502565"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="217068179">
@@ -1700,7 +1700,7 @@
 										<object class="NSButton" id="963880187">
 											<reference key="NSNextResponder" ref="13502565"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{189, 271}, {103, 28}}</string>
+											<string key="NSFrame">{{194, 277}, {103, 28}}</string>
 											<reference key="NSSuperview" ref="13502565"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="823012691">
@@ -1772,7 +1772,7 @@
 											<reference key="NSSuperview" ref="13502565"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="613766194">
-												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags">68812352</int>
 												<int key="NSCellFlags2">71435264</int>
 												<string key="NSContents">Label</string>
 												<object class="NSFont" key="NSSupport" id="441801918">
@@ -1792,7 +1792,7 @@
 											<reference key="NSSuperview" ref="13502565"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="1022062072">
-												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags">68812352</int>
 												<int key="NSCellFlags2">71435264</int>
 												<string key="NSContents">Label</string>
 												<reference key="NSSupport" ref="441801918"/>
@@ -1808,7 +1808,7 @@
 											<reference key="NSSuperview" ref="13502565"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="288452241">
-												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags">68812352</int>
 												<int key="NSCellFlags2">71435264</int>
 												<string key="NSContents">Label</string>
 												<reference key="NSSupport" ref="441801918"/>
@@ -1886,7 +1886,7 @@
 										<object class="NSButton" id="968990766">
 											<reference key="NSNextResponder" ref="13502565"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{189, 245}, {103, 28}}</string>
+											<string key="NSFrame">{{194, 251}, {103, 28}}</string>
 											<reference key="NSSuperview" ref="13502565"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSButtonCell" key="NSCell" id="982151471">
@@ -3282,6 +3282,22 @@
 					</object>
 					<int key="connectionID">772</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">calibrationBoxPanServo</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="236771042"/>
+					</object>
+					<int key="connectionID">776</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">calibrationBoxTiltServo</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="673902416"/>
+					</object>
+					<int key="connectionID">777</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -4580,11 +4596,11 @@
 							<reference ref="388546792"/>
 							<reference ref="1062719531"/>
 							<reference ref="987497743"/>
+							<reference ref="236771042"/>
+							<reference ref="673902416"/>
 							<reference ref="30386987"/>
 							<reference ref="963880187"/>
 							<reference ref="968990766"/>
-							<reference ref="236771042"/>
-							<reference ref="673902416"/>
 						</object>
 						<reference key="parent" ref="439893737"/>
 					</object>
@@ -5425,9 +5441,9 @@
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
-					<string>{{360, 121}, {349, 865}}</string>
+					<string>{{410, 137}, {349, 865}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{360, 121}, {349, 865}}</string>
+					<string>{{410, 137}, {349, 865}}</string>
 					<integer value="1"/>
 					<string>{{33, 99}, {480, 360}}</string>
 					<string>{3.40282e+38, 3.40282e+38}</string>
@@ -5652,7 +5668,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">772</int>
+			<int key="maxID">785</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5729,6 +5745,9 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>calibrateEnableButton</string>
+							<string>calibrationBoxPanServo</string>
+							<string>calibrationBoxTiltServo</string>
 							<string>downlinkPacketCrcLabel</string>
 							<string>downlinkPacketCrcReportLabel</string>
 							<string>downlinkPacketFrameLabel</string>
@@ -5747,6 +5766,9 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>NSButton</string>
+							<string>NSBox</string>
+							<string>NSBox</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -5768,6 +5790,9 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>calibrateEnableButton</string>
+							<string>calibrationBoxPanServo</string>
+							<string>calibrationBoxTiltServo</string>
 							<string>downlinkPacketCrcLabel</string>
 							<string>downlinkPacketCrcReportLabel</string>
 							<string>downlinkPacketFrameLabel</string>
@@ -5786,6 +5811,18 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBToOneOutletInfo">
+								<string key="name">calibrateEnableButton</string>
+								<string key="candidateClassName">NSButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">calibrationBoxPanServo</string>
+								<string key="candidateClassName">NSBox</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">calibrationBoxTiltServo</string>
+								<string key="candidateClassName">NSBox</string>
+							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">downlinkPacketCrcLabel</string>
 								<string key="candidateClassName">NSTextField</string>
