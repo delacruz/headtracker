@@ -83,21 +83,32 @@ int main(void)
     //FILE   *u1;
 	unsigned char uplinkFrame[255];
 	unsigned char uplinkFrameIndex=0;
-	unsigned char uplinkReportFrame[255];
-	unsigned char uplinkReportFrameIndex=0;
+	unsigned char downlinkFrame[255];
+	unsigned char downlinkFrameIndex=0;
 	uint16_t panServoPulse = 1500;
 	uint16_t tiltServoPulse = 1500;
-	char newStuff = 0;
+	uint16_t targetPanServoPulse = 1500;
+	uint16_t targetTiltServoPulse = 1500;
+	uint16_t initialPanServoPulse = 1500;
+	uint16_t initialTiltServoPulse = 1500;
+	
+	tick_t tickLastValidUplinkPacket;
+	tick_t ticksBetweenPackets;
+	tick_t smoothingTick = 0;
+	
+	char newCommandAvailable = 0;
 	char badHappened = 0;
+	
 	
 	uint16_t crcErrorCountUplink = 0;
 	
 	InitHardware();
 	InitServoTimer(3);
+	InitServoTimer(1);
 	
     u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
-
-    //char c;
+	
+	tickLastValidUplinkPacket = gTickCount; // TODO: Necessary? Probly not.
 	
     while(1)
 	{
@@ -111,10 +122,13 @@ int main(void)
 		// Handle all available packets in Rx buffer
 		while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
 		{
-			newStuff = 1;
+			
 			//printf("\nmore than one packet!\n");
 			if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
 			{
+				// Set flag
+				newCommandAvailable = 1;
+				
 				// Handle Packet
 				uint8_t *ptr = (uint8_t*)uplinkFrame;
 				
@@ -122,18 +136,28 @@ int main(void)
 				ptr+=2;
 				
 				// Grab pan servo pulse
-				memcpy(&panServoPulse, ptr, sizeof(panServoPulse));
-				ptr += sizeof(panServoPulse);
+				memcpy(&targetPanServoPulse, ptr, sizeof(targetPanServoPulse));
+				ptr += sizeof(targetPanServoPulse);
 				
 				// Grab tilt servo pulse
-				memcpy(&tiltServoPulse, ptr, sizeof(tiltServoPulse));
-				ptr += sizeof(tiltServoPulse);
+				memcpy(&targetTiltServoPulse, ptr, sizeof(targetTiltServoPulse));
+				ptr += sizeof(targetTiltServoPulse);
 				
 				//printf("\nPan Servo Pulse: %hu\tTilt Servo Pulse: %hu", panServoPulse, tiltServoPulse);
 				
 				// Pop the packet
 				memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
 				uplinkFrameIndex-=UPLINK_PACKET_SIZE;
+				
+				if (gTickCount != tickLastValidUplinkPacket) 
+				{
+					ticksBetweenPackets = gTickCount - tickLastValidUplinkPacket;
+					tickLastValidUplinkPacket = gTickCount;
+					initialPanServoPulse = panServoPulse;
+					initialTiltServoPulse = tiltServoPulse;
+					smoothingTick = 0;
+				}
+				
 			}
 			else 
 			{
@@ -177,16 +201,15 @@ int main(void)
 		if(gTickCount%2==0) // 50Hz
 		{
 			
-			if (newStuff) 
+			if (newCommandAvailable) 
 			{
 				LED_ON(BLUE);
-				newStuff=0;
+				newCommandAvailable=0;
 			}
 			else 
 			{
 				LED_OFF(BLUE);
 			}
-			
 			
 			
 		}
@@ -221,30 +244,45 @@ int main(void)
 		{
 			
 			uint16_t header = 0xbeef;
-			uplinkReportFrameIndex = 0;
+			downlinkFrameIndex = 0;
 			
-			memcpy(uplinkReportFrame, &header, sizeof(header));
-			uplinkReportFrameIndex += sizeof(header);
+			memcpy(downlinkFrame, &header, sizeof(header));
+			downlinkFrameIndex += sizeof(header);
 			
-			memcpy(&uplinkReportFrame[uplinkReportFrameIndex], &crcErrorCountUplink, sizeof(crcErrorCountUplink));
-			uplinkReportFrameIndex += sizeof(crcErrorCountUplink);
+			memcpy(&downlinkFrame[downlinkFrameIndex], &crcErrorCountUplink, sizeof(crcErrorCountUplink));
+			downlinkFrameIndex += sizeof(crcErrorCountUplink);
 			
 			uint16_t crc = 0xffff;
-			crc = crc16_array_update(&uplinkReportFrame[2], 2);//_crc16_update(crc, crcErrorCountUplink);
+			crc = crc16_array_update(&downlinkFrame[2], 2);//_crc16_update(crc, crcErrorCountUplink);
 			
-			memcpy(&uplinkReportFrame[uplinkReportFrameIndex], &crc, sizeof(crc));
-			uplinkReportFrameIndex += sizeof(crc);
+			memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
+			downlinkFrameIndex += sizeof(crc);
 			
-			UART0_Write(uplinkReportFrame, UPLINK_REPORT_PACKET_SIZE);
-			
+			//UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
+			printf("\npan: %hu target: %hu ticks-between: %hu initial: %hu", panServoPulse, targetPanServoPulse, ticksBetweenPackets, initialPanServoPulse);
 			LED_TOGGLE(YELLOW);
 		}
 		
+
+		if (panServoPulse != targetPanServoPulse || tiltServoPulse!=targetTiltServoPulse) 
+		{
+			smoothingTick++;
+			panServoPulse = (uint16_t)(((int)targetPanServoPulse-(int)initialPanServoPulse) * (smoothingTick / (float)ticksBetweenPackets) + (int)initialPanServoPulse);
+			tiltServoPulse = (uint16_t)(((int)targetTiltServoPulse-(int)initialTiltServoPulse) * (smoothingTick / (float)ticksBetweenPackets) + (int)initialTiltServoPulse);
+		}
+		
+		if (panServoPulse>2000) 
+		{
+			printf("\nBEEF: pan: %hu target-tick: %hu ticks-between: %hu initial: %hu smoothing tick: %hu", panServoPulse, targetPanServoPulse, ticksBetweenPackets, initialPanServoPulse, smoothingTick);
+		}
+		//tiltServoPulse = (uint16_t)((targetTiltServoPulse-initialTiltServoPulse) * (smoothingTick / (float)ticksBetweenPackets) + initialTiltServoPulse);
+		//}
 		// Set servos
 		SetServo(SERVO_3A, panServoPulse);
 		SetServo(SERVO_3B, tiltServoPulse);
 	
 		WaitForTimer0Rollover();
+
     }
     return 0;   /* never reached */
 }

@@ -92,7 +92,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	*index = 0;
 }
 
-#define PRINTRX 0
+#define PRINTRX 1
 
 - (void)downlinkReaderLoop
 {
@@ -254,7 +254,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 											   object:nil];
 	[downlinkThread start];
 	
-	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.05
+	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1
 												   target: self
 												 selector: @selector(onUplinkTimer:)
 												 userInfo: nil
@@ -371,7 +371,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	[uplinkPacketCrcLabel setIntValue:crc];
 	
 	crc16_verify(buffer, PACKET_SIZE_HEADTRACKER);
-	//NSLog(@"Tx %@", bytesAsString);
+	NSLog(@"Tx %@", bytesAsString);
 	
 	//unsigned char testbuffer[PACKET_SIZE_HEADTRACKER] = {0xEF, 0xBE, 0x25, 0x05, 0x01, 0x00, 0xF1, 0x0D};
 	// Send the Packet
@@ -380,6 +380,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	{
 		memcpy(uplinkPacket, buffer, PACKET_SIZE_HEADTRACKER);
 	}
+	//write_uplink(serialWriteFileDescriptor, buffer, PACKET_SIZE_HEADTRACKER);
 }
 
 - (IBAction)sendBadByte:(id)sender
