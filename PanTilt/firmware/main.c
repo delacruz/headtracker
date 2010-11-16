@@ -122,8 +122,7 @@ int main(void)
 		// Handle all available packets in Rx buffer
 		while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
 		{
-			
-			//printf("\nmore than one packet!\n");
+			// If CRC is good, handle packet
 			if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
 			{
 				// Set flag
@@ -151,24 +150,23 @@ int main(void)
 				
 				if (gTickCount != tickLastValidUplinkPacket) 
 				{
+					// Get time to interpolate through
 					ticksBetweenPackets = gTickCount - tickLastValidUplinkPacket;
+					
+					// Set variable for las valid packet to now
 					tickLastValidUplinkPacket = gTickCount;
+					
+					// Initial servo positions become = to wherever they are now
 					initialPanServoPulse = panServoPulse;
 					initialTiltServoPulse = tiltServoPulse;
+					
+					// Reset our interpolation tick
 					smoothingTick = 0;
 				}
-				
 			}
+			// CRC is bad
 			else 
 			{
-//				printf("\nBad CRC, for packet: ");
-//				int i;
-//				for (i=0; i<uplinkFrameIndex; i++) 
-//				{
-//					printf("%.2X ", uplinkFrame[i]);
-//				}
-//				
-				
 				// Update crc error counter
 				crcErrorCountUplink++;
 				badHappened = 1;
@@ -176,31 +174,15 @@ int main(void)
 				// Chop off head
 				memcpy(uplinkFrame, &uplinkFrame[2], uplinkFrameIndex-2);
 				uplinkFrameIndex-=2;
-				
-//				printf("\nChopped head, now have: ");
-//				for (i=0; i<uplinkFrameIndex; i++) 
-//				{
-//					printf("%.2X ", uplinkFrame[i]);
-//				}
-				
+
 				// Trim bad bytes til next header
 				scoot(uplinkFrame, &uplinkFrameIndex);
-				
-//				printf("\nNow trimmed: ");
-//				for (i=0; i<uplinkFrameIndex; i++) 
-//				{
-//					printf("%.2X ", uplinkFrame[i]);
-//				}
-//				printf("\nTotal crc bad: %d", crcErrorCountUplink);
 			}
-				
-
-
 		}
 		
 		if(gTickCount%2==0) // 50Hz
 		{
-			
+			// Blink blue light if we received a valid packet
 			if (newCommandAvailable) 
 			{
 				LED_ON(BLUE);
@@ -210,25 +192,11 @@ int main(void)
 			{
 				LED_OFF(BLUE);
 			}
-			
-			
-		}
-	
-		if(gTickCount%5==0)  // 20Hz
-		{
-
-
-		}
-		
-		if(gTickCount%10==0) // 10Hz
-		{
-
-
-
 		}
 		
 		if(gTickCount%20==0) // 5Hz
 		{
+			// Blink red LED anytime bad happens
 			if (badHappened) 
 			{
 				LED_ON(RED);
@@ -258,31 +226,25 @@ int main(void)
 			memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
 			downlinkFrameIndex += sizeof(crc);
 			
-			//UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
-			printf("\npan: %hu target: %hu ticks-between: %hu initial: %hu", panServoPulse, targetPanServoPulse, ticksBetweenPackets, initialPanServoPulse);
+			UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
 			LED_TOGGLE(YELLOW);
 		}
 		
-
+		// If either servo has not reached it's target pulse, continue interpolation
 		if (panServoPulse != targetPanServoPulse || tiltServoPulse!=targetTiltServoPulse) 
 		{
 			smoothingTick++;
 			panServoPulse = (uint16_t)(((int)targetPanServoPulse-(int)initialPanServoPulse) * (smoothingTick / (float)ticksBetweenPackets) + (int)initialPanServoPulse);
 			tiltServoPulse = (uint16_t)(((int)targetTiltServoPulse-(int)initialTiltServoPulse) * (smoothingTick / (float)ticksBetweenPackets) + (int)initialTiltServoPulse);
 		}
-		
-		if (panServoPulse>2000) 
-		{
-			printf("\nBEEF: pan: %hu target-tick: %hu ticks-between: %hu initial: %hu smoothing tick: %hu", panServoPulse, targetPanServoPulse, ticksBetweenPackets, initialPanServoPulse, smoothingTick);
-		}
-		//tiltServoPulse = (uint16_t)((targetTiltServoPulse-initialTiltServoPulse) * (smoothingTick / (float)ticksBetweenPackets) + initialTiltServoPulse);
-		//}
+
 		// Set servos
 		SetServo(SERVO_3A, panServoPulse);
 		SetServo(SERVO_3B, tiltServoPulse);
 	
 		WaitForTimer0Rollover();
-
     }
-    return 0;   /* never reached */
+	
+	// You've gone too far
+    return 0; 
 }
