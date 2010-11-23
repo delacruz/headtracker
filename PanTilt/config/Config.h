@@ -42,6 +42,8 @@
 
 #define CFG_TIMER_MS_TICK 1
 
+#define CFG_RCI_TIMER	3
+
 
 
 #endif  // CONFIG_H

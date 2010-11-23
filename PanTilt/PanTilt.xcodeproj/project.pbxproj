@@ -204,6 +204,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
+				HEADER_SEARCH_PATHS = "/usr/local/CrossPack-AVR/avr/include/avr";
 			};
 			name = Release;
 		};

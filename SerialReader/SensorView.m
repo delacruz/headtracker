@@ -49,23 +49,6 @@
 	
 }
 
-/* FIXME: this one doesn't work right :(
- - (id)initWithFrame:(NSRect)frameRect
- {
- NSLog(@"initWithFrame:");
- 
- NSOpenGLPixelFormatAttribute attrs[] = 
- {   NSOpenGLPFAAllRenderers, NSOpenGLPFADoubleBuffer,
- NSOpenGLPFADepthSize, 16,
- NSOpenGLPFAColorSize, 32,
- 0 };
- NSOpenGLPixelFormat* pixFmt ;
- pixFmt = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs] ;
- [super initWithFrame:frameRect pixelFormat:pixFmt];
- [self prepare];
- return self;
- }
- */
 - (id)initWithCoder:(NSCoder *)c
 {
 	NSLog(@"initWithCoder:");
@@ -91,8 +74,6 @@
 {
 
 }
-
-
 
 - (void)drawRect:(NSRect)r
 {

@@ -12,9 +12,12 @@
 #include <string.h>
 #include <util/crc16.h>
 #include "Servo.h"
+#include "RCInput.h"
 
 #define UPLINK_PACKET_SIZE 8
 #define UPLINK_REPORT_PACKET_SIZE 6
+
+volatile uint16_t gMeasuredPulseWidth;
 
 void scoot(unsigned char* buffer, unsigned char* index);
 void scoot(unsigned char* buffer, unsigned char* index)
@@ -77,6 +80,25 @@ char crc16_verify(const void* array, uint8_t length)
 	return crc == packet_crc;
 }
 
+static void PulseDetected( uint8_t channel, uint16_t pulseWidth )
+{
+	//gLastChannel = channel;
+	gMeasuredPulseWidth = pulseWidth;
+	
+	// gMeasuredPulseWidth += 5;
+	// gMeasuredPulseWidth /= 10;
+	
+	LED_TOGGLE( BLUE );
+}
+
+static void MissingPulse( void )
+{
+	//gLastChannel = 0;
+	gMeasuredPulseWidth = 6969;
+	LED_TOGGLE( YELLOW );
+}
+
+
 int main(void)
 {
 	FILE   *u0;
@@ -105,6 +127,7 @@ int main(void)
 	InitHardware();
 	InitServoTimer(3);
 	InitServoTimer(1);
+	
 	
     u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	

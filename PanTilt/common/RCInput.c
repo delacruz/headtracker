@@ -1,25 +1,25 @@
 /****************************************************************************
-*
-*   Copyright (c) 2006 Dave Hylands     <dhylands@gmail.com>
-*
-*   This program is free software; you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License version 2 as
-*   published by the Free Software Foundation.
-*
-*   Alternatively, this software may be distributed under the terms of BSD
-*   license.
-*
-*   See README and COPYING for more details.
-*
-****************************************************************************/
+ *
+ *   Copyright (c) 2006 Dave Hylands     <dhylands@gmail.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License version 2 as
+ *   published by the Free Software Foundation.
+ *
+ *   Alternatively, this software may be distributed under the terms of BSD
+ *   license.
+ *
+ *   See README and COPYING for more details.
+ *
+ ****************************************************************************/
 /**
-*
-*   @file   RCInput.c
-*
-*   @brief  This file implements a way of measuring multiple channels from
-*           an RC Receiver.
-*
-****************************************************************************/
+ *
+ *   @file   RCInput.c
+ *
+ *   @brief  This file implements a way of measuring multiple channels from
+ *           an RC Receiver.
+ *
+ ****************************************************************************/
 
 // ---- Include Files -------------------------------------------------------
 
@@ -30,6 +30,7 @@
 #include "Config.h"
 #include "RCInput.h"
 #include "Timer.h"
+#include "Hardware.h"
 
 // ---- Public Variables ----------------------------------------------------
 // ---- Private Constants and Types -----------------------------------------
@@ -148,10 +149,10 @@ static  RCI_MissingPulseCB      gMissingPulseCB;
 #if ( CFG_RCI_TIMER == 2 )
 /***************************************************************************/
 /**
-*   Combines TCNT and gTimer2OverflowCount to produce a 16-bit timer value.
-*
-*   This function assumes that its called with interrupts disabled.
-*/
+ *   Combines TCNT and gTimer2OverflowCount to produce a 16-bit timer value.
+ *
+ *   This function assumes that its called with interrupts disabled.
+ */
 
 inline uint16_t GetTimer2Count( void );
 
@@ -159,7 +160,7 @@ inline uint16_t GetTimer2Count( void )
 {
     uint8_t cntHi;
     uint8_t cntLo;
-
+	
     cntLo = TCNT2;
     cntHi = gTimer2OverflowCount;
     if ( TIFR & ( 1 << TOV2 ))
@@ -171,47 +172,47 @@ inline uint16_t GetTimer2Count( void )
         cntLo = TCNT2;
         cntHi++;
     }
-
+	
     return ((uint16_t)cntHi << 8 ) | (uint16_t)cntLo;
-
+	
 } // GetTimer2Count
 
 #endif
 
 /***************************************************************************/
 /**
-*   Determines if we're in the "missing pulse" state.
-*/
+ *   Determines if we're in the "missing pulse" state.
+ */
 
 inline uint8_t PulsesAreMissing( void );
 inline uint8_t PulsesAreMissing( void )
 {
     return gOverflowCount >= 2;
-
+	
 } // PulsesAreMissing
 
 /***************************************************************************/
 /**
-*   Interrupt handler for the Timer overflow
-*/
+ *   Interrupt handler for the Timer overflow
+ */
 
 volatile uint32_t gXOverflowCount;
 
 ISR( RCI_OVF_vect )
 {
     gXOverflowCount++;
-
+	
 #if ( CFG_RCI_TIMER == 2 )
     {
         // The 8-bit timer overflowed.
-
+		
         gTimer2OverflowCount++;
-
+		
         if ( gTimer2OverflowCount != 0 )
         {
             return;
         }
-
+		
         // When gTimer2OverflowCount becomes 0, we fall through, since 
         // we've just overflowed the 16-bit counter.
     }
@@ -219,7 +220,7 @@ ISR( RCI_OVF_vect )
     if ( PulsesAreMissing() )
     {
         gPulseIndex = 0;
-
+		
         if ( gMissingPulseCB != NULL )
         {
             gMissingPulseCB();
@@ -229,139 +230,128 @@ ISR( RCI_OVF_vect )
     {
         gOverflowCount++;
     }
-
+	
 } // RCI_OVF_vect
 
 /***************************************************************************/
 /**
-*   Interrupt handler for the Capture event
-*/
+ *   Interrupt handler for the Capture event
+ */
 
 volatile uint32_t gCaptureCount = 0;
+
+
 
 ISR( RCI_CAPT_vect )
 {
     uint16_t    captureTime = RCI_TCNT;
-
+	
     gCaptureCount++;
-
-    if ( PulsesAreMissing() )
-    {
-        // The first pulse in a long time. We can't call it a sync pulse.
-
-        gPulseIndex = 0;    // pulses will be ignored until we hit a sync
-        gOverflowCount = 0; // We're not in an overflow condition any more
-
+	
+ 	if (TCCR3B & (1<<ICES3)) //if rising edge
+	{
         gLastEdgeTime = captureTime;
-    }
-    else
-    {
-        uint16_t    pulseWidth = captureTime - gLastEdgeTime;
-
-        gLastEdgeTime = captureTime;
-
-        pulseWidth >>= 1;  // Divide by 2 to convert into usec
-
-        if ( pulseWidth >= CFG_RCI_SYNC_TIME )
+		
+		TCCR3B &= ~(1<<ICES3);
+	}
+	else // falling edge
+	{
+		TCCR3B |= (1<<ICES3);
+		uint16_t    pulseWidth = captureTime - gLastEdgeTime;
+		pulseWidth >>= 1;  // Divide by 2 to convert into usec
+		
+		if ( gPulseDetectedCB != NULL )
         {
-            // We've detected a sync pulse. This means that we're now 
-            // measuring the first pulse.
-
-            gPulseIndex = 1;
-            gOverflowCount = 0;
+            gPulseDetectedCB( gPulseIndex, pulseWidth );
         }
-        else
-        {
-            if ( gPulseDetectedCB != NULL )
-            {
-                gPulseDetectedCB( gPulseIndex, pulseWidth );
-            }
-
-            gPulseIndex++;
-        }
-    }
-
+		
+		LED_TOGGLE( RED );
+	}
+	
+	gPulseIndex=1;
+	gOverflowCount=0;
+	
 } // RCI_CAPT_vect
 
 /***************************************************************************/
 /**
-*   Initializes the timer used for capturing the input stream.
-*/
+ *   Initializes the timer used for capturing the input stream.
+ */
 
 void RCI_Init( void )
 {
     gOverflowCount = -1;
     gPulseIndex = 0;
     gLastEdgeTime = 0;
-
+	
 #if ( CFG_CPU_CLOCK == 16000000 )
-
+	
     // Set the timer to run at 2 MHz (divide by 8 prescalar)
-
+	
 #   if ( CFG_RCI_TIMER == 1 )
-
+	
     // Since the 3 outputs could be used for driving servos, we don't touch
     // any bits associated with controlling the output.
-
+	
     // WGM Mode 0: Normal is also fine. We do use the overflow interrupt
     // and the ICR register so some modes aren't fine.
-
+	
     TCCR1B = ( TCCR1B & ~TIMER1_CLOCK_SEL_MASK )
-           | (( 1 << ICNC1 ) | ( 1 << ICES1 ) | TIMER1_CLOCK_SEL_DIV_8 );
-
+	| (( 1 << ICNC1 ) | ( 1 << ICES1 ) | TIMER1_CLOCK_SEL_DIV_8 );
+	
     TCNT1H = 0; // Need to write high byte first
     TCNT1L = 0;
-
+	
     TIMSK |= (( 1 << TICIE1 ) | ( 1 << TOIE1 ));
-
+	
 #   elif ( CFG_RCI_TIMER == 2 )
-
+	
     // WGM Mode 0: Normal mode
-
+	
     TCCR2 = TIMER2_CLOCK_SEL_DIV_8;
     gTimer2OverflowCount = 0;
     TCNT2 = 0;
     TIMSK |= ( 1 << TOIE2 );
-
+	
     // Disable the external interrupt so we don't false while changing the EICR register
-
+	
     EIMSK &= ~RCI_EXT_INT_MASK;
-
+	
     // Configure the appropriate input pin as an input
-
+	
     RCI_EXT_INT_DDR &= ~RCI_EXT_INT_MASK;
-
+	
     // Configure the external interrupt as triggering on the rising edge.
-
+	
     RCI_EXT_INT_EICR |= RCI_EXT_INT_EICR_VAL;
-
+	
     // Re-eanble the external interrupt
-
+	
     EIMSK |= RCI_EXT_INT_MASK;
-
+	
 #   elif ( CFG_RCI_TIMER == 3 )
-
+	
     TCCR3B = ( TCCR3B & ~TIMER3_CLOCK_SEL_MASK ) 
-           | (( 1 << ICNC3 ) | ( 1 << ICES3 ) | TIMER3_CLOCK_SEL_DIV_8 );
-
+	| (( 1 << ICNC3 ) | ( 1 << ICES3 ) | TIMER3_CLOCK_SEL_DIV_8 );
+	
     TCNT3H = 0; // Need to write high byte first
     TCNT3L = 0;
-
+	
     ETIMSK |= (( 1 << TICIE3 ) | ( 1 << TOIE3 ));
-
+	
 #   else
 #       error Unsupported value for CFG_RCI_TIMER
 #   endif
 #else
 #   error Unsupported clock frequency
 #endif
-
+	
 } // RCI_Init
 
 /***************************************************************************/
 /**
-*  Sets the callback which is called when a pulse is detected.
-*/
+ *  Sets the callback which is called when a pulse is detected.
+ */
 
 void RCI_SetPulseCallback( RCI_PulseDetectedCB pulseDetectedCB )
 {

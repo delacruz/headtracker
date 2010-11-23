@@ -66,7 +66,7 @@ NSString * const KeyServoPulseMaxTilt = @"TiltServoMaxPulse";
 	[pool drain];
 }
 
-void scoot(unsigned char* buffer, unsigned char* index)
+void trimToHeader(unsigned char* buffer, unsigned char* index)
 {
 	// Discard bytes until a header is found
 	int i;
@@ -120,7 +120,7 @@ void scoot(unsigned char* buffer, unsigned char* index)
 		memcpy(&downlinkFrame[downlinkFrameIndex], buffer, numBytesRead);
 		downlinkFrameIndex += numBytesRead;
 		
-		scoot(downlinkFrame, &downlinkFrameIndex);
+		trimToHeader(downlinkFrame, &downlinkFrameIndex);
 		
 		// Handle all packets in buffer
 		while (downlinkFrameIndex >= SIZE_FULL_FRAME) 
@@ -171,11 +171,9 @@ void scoot(unsigned char* buffer, unsigned char* index)
 				// Chop head
 				memcpy(downlinkFrame, &downlinkFrame[2], downlinkFrameIndex-2);
 				downlinkFrameIndex -= 2;
-				scoot(downlinkFrame, &downlinkFrameIndex);
+				trimToHeader(downlinkFrame, &downlinkFrameIndex);
 			}
-
 		}
-
 		
 #endif
 	}
@@ -215,29 +213,6 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	[self didChangeValueForKey:@"servoPulseMaxTilt"];
 	
 	lockUplinkPacket = [[NSLock alloc] init]; // TODO: release this on dispose?
-	
-	// Create uplink timer
-	
-	
-//	unsigned char testBuffer[] = {0xEF, 0xBE, 0x06, 0x09, 0x01, 0xb0};
-//	uint16_t crc = 0xffff;
-//	crc = crc16_update(crc, 0x06);
-//	crc = crc16_update(crc, 0x09);
-//	
-//	NSLog(@"crc single call resulted in:  %hu", crc);
-//	
-//	crc = crc16_array_update(&testBuffer[2], 2);
-//	
-//	NSLog(@"crc arra call resulted in:  %hu", crc);
-//	
-//	if (crc16_verify(testBuffer, 6)) {
-//		NSLog(@"it verifies");
-//	}
-//	else {
-//		NSLog(@"it dont verify");
-//	}
-
-	
 }
 
 - (IBAction)startReadingSensorData:(id)sender
@@ -331,7 +306,6 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	
 	unsigned short servoPulsePitch = (unsigned short)calculatedPulsePitch;
 
-//	[pitchLabel setFloatValue: pitch];
 	[pitchPulseLabel setIntValue:servoPulsePitch];
 	
 	prevPitch = pitch;
@@ -370,17 +344,11 @@ void scoot(unsigned char* buffer, unsigned char* index)
 	[uplinkpacketFrameLabel setStringValue:bytesAsString];
 	[uplinkPacketCrcLabel setIntValue:crc];
 	
-//	crc16_verify(buffer, PACKET_SIZE_HEADTRACKER);
-//	NSLog(@"Tx %@", bytesAsString);
-	
-	//unsigned char testbuffer[PACKET_SIZE_HEADTRACKER] = {0xEF, 0xBE, 0x25, 0x05, 0x01, 0x00, 0xF1, 0x0D};
-	// Send the Packet
-	
+	// Ready to be sent, copy to uplinkPacket memory
 	@synchronized(lockUplinkPacket)
 	{
 		memcpy(uplinkPacket, buffer, PACKET_SIZE_HEADTRACKER);
 	}
-	//write_uplink(serialWriteFileDescriptor, buffer, PACKET_SIZE_HEADTRACKER);
 }
 
 - (IBAction)sendBadByte:(id)sender
