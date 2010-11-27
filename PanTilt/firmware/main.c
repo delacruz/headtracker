@@ -12,15 +12,47 @@
 #include <string.h>
 #include <util/crc16.h>
 #include "Servo.h"
-#include "RCInput.h"
+#include "RCInput.h" 
 
-#define UPLINK_PACKET_SIZE 8
 #define UPLINK_REPORT_PACKET_SIZE 6
+
+#define HEADER_SIZE 2
+#define CRC_SIZE 2
+
+
+#define FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND 0x32
+#define FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE 9
 
 volatile uint16_t gMeasuredPulseWidth;
 
-void scoot(unsigned char* buffer, unsigned char* index);
-void scoot(unsigned char* buffer, unsigned char* index)
+char HasFullPacketAvailable(uint8_t *buffer, uint8_t index);
+char HasFullPacketAvailable(uint8_t *buffer, uint8_t index)
+{
+	if (index < HEADER_SIZE + 1) 
+	{
+		return 0;
+	}
+	
+	uint8_t frameType = buffer[HEADER_SIZE];
+	
+	switch (frameType) {
+		case FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND:
+			return index >= FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE;
+			break;
+		default:
+			return 0;
+			break;
+	}
+}
+
+void HandleHeadtrackerCommand(uint8_t* buffer, uint8_t* indexPtr, uint16_t* targetPanServorPulsePtr, uint16_t* targetTiltServoPulsePtr);
+void HandleHeadtrackerCommand(uint8_t* buffer, uint8_t* indexPtr, uint16_t* targetPanServorPulsePtr, uint16_t* targetTiltServoPulsePtr)
+{
+	
+}
+
+char scoot(unsigned char* buffer, unsigned char* index);
+char scoot(unsigned char* buffer, unsigned char* index)
 {
 	// Discard bytes until a header is found
 	int i;
@@ -38,12 +70,13 @@ void scoot(unsigned char* buffer, unsigned char* index)
 			}
 			
 			// Done here, header at start of frame
-			return;
+			return 1;
 		}
 	}
 	
 	// No header found, set index to 0
 	*index = 0;
+	return 0;
 }
 
 uint16_t crc16_array_update(const void* array, uint8_t length);
@@ -82,11 +115,8 @@ char crc16_verify(const void* array, uint8_t length)
 
 static void PulseDetected( uint8_t channel, uint16_t pulseWidth )
 {
-	//gLastChannel = channel;
 	gMeasuredPulseWidth = pulseWidth;
-	
-	// gMeasuredPulseWidth += 5;
-	// gMeasuredPulseWidth /= 10;
+
 	
 	LED_TOGGLE( BLUE );
 }
@@ -114,6 +144,10 @@ int main(void)
 	uint16_t initialPanServoPulse = 1500;
 	uint16_t initialTiltServoPulse = 1500;
 	
+	uint8_t frameType = 0xff;
+	
+	char isFrameInSync = 0;
+	
 	tick_t tickLastValidUplinkPacket;
 	tick_t ticksBetweenPackets;
 	tick_t smoothingTick = 0;
@@ -135,73 +169,101 @@ int main(void)
 	
     while(1)
 	{
+		// Get all available bytes
 		while(UART0_IsCharAvailable())
 		{
 			uplinkFrame[uplinkFrameIndex++] = UART0_GetChar();
 			
 		}
 		
-
-		// Handle all available packets in Rx buffer
-		while(uplinkFrameIndex >= UPLINK_PACKET_SIZE)
+		// Resync if needed
+		if (!isFrameInSync) 
 		{
-			// If CRC is good, handle packet
-			if(crc16_verify(&uplinkFrame, UPLINK_PACKET_SIZE)) // TODO: Add size of frame to systemwide include file
-			{
-				// Set flag
-				newCommandAvailable = 1;
-				
-				// Handle Packet
-				uint8_t *ptr = (uint8_t*)uplinkFrame;
-				
-				// Skip Header
-				ptr+=2;
-				
-				// Grab pan servo pulse
-				memcpy(&targetPanServoPulse, ptr, sizeof(targetPanServoPulse));
-				ptr += sizeof(targetPanServoPulse);
-				
-				// Grab tilt servo pulse
-				memcpy(&targetTiltServoPulse, ptr, sizeof(targetTiltServoPulse));
-				ptr += sizeof(targetTiltServoPulse);
-				
-				//printf("\nPan Servo Pulse: %hu\tTilt Servo Pulse: %hu", panServoPulse, tiltServoPulse);
-				
-				// Pop the packet
-				memcpy(uplinkFrame, &uplinkFrame[UPLINK_PACKET_SIZE], uplinkFrameIndex-UPLINK_PACKET_SIZE);
-				uplinkFrameIndex-=UPLINK_PACKET_SIZE;
-				
-				if (gTickCount != tickLastValidUplinkPacket) 
-				{
-					// Get time to interpolate through
-					ticksBetweenPackets = gTickCount - tickLastValidUplinkPacket;
-					
-					// Set variable for las valid packet to now
-					tickLastValidUplinkPacket = gTickCount;
-					
-					// Initial servo positions become = to wherever they are now
-					initialPanServoPulse = panServoPulse;
-					initialTiltServoPulse = tiltServoPulse;
-					
-					// Reset our interpolation tick
-					smoothingTick = 0;
-				}
-			}
-			// CRC is bad
-			else 
-			{
-				// Update crc error counter
-				crcErrorCountUplink++;
-				badHappened = 1;
-				
-				// Chop off head
-				memcpy(uplinkFrame, &uplinkFrame[2], uplinkFrameIndex-2);
-				uplinkFrameIndex-=2;
-
-				// Trim bad bytes til next header
-				scoot(uplinkFrame, &uplinkFrameIndex);
-			}
+			isFrameInSync = scoot(uplinkFrame, &uplinkFrameIndex);
 		}
+		
+		// Process all packets in buffer
+		while (isFrameInSync && HasFullPacketAvailable(uplinkFrame, uplinkFrameIndex))
+		{
+
+			frameType = uplinkFrame[HEADER_SIZE];
+			
+			// Handle based on packet type
+			switch (frameType) 
+			{
+				case FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND:
+					// handle frame
+					// If CRC is good, handle packet
+					if(crc16_verify(&uplinkFrame, FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE)) // TODO: Add size of frame to systemwide include file
+					{
+						
+						// Set flag
+						newCommandAvailable = 1;
+						
+						// Handle Packet
+						uint8_t *ptr = (uint8_t*)uplinkFrame;
+						
+						// Skip Header
+						ptr+=2;
+						
+						// Skip packet-type id
+						ptr+=1;
+						
+						// Grab pan servo pulse
+						memcpy(&targetPanServoPulse, ptr, sizeof(targetPanServoPulse));
+						ptr += sizeof(targetPanServoPulse);
+						
+						// Grab tilt servo pulse
+						memcpy(&targetTiltServoPulse, ptr, sizeof(targetTiltServoPulse));
+						ptr += sizeof(targetTiltServoPulse);
+						
+						printf("\nTarget Pan Servo Pulse: %hu\tTarget Tilt Servo Pulse: %hu", targetPanServoPulse, targetTiltServoPulse);
+						
+						// Pop the packet
+						memcpy(uplinkFrame, &uplinkFrame[FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE], uplinkFrameIndex-FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE);
+						uplinkFrameIndex-=FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE;
+						
+						if (gTickCount != tickLastValidUplinkPacket) 
+						{
+							// Get time to interpolate through
+							ticksBetweenPackets = gTickCount - tickLastValidUplinkPacket;
+							
+							// Set variable for las valid packet to now
+							tickLastValidUplinkPacket = gTickCount;
+							
+							// Initial servo positions become = to wherever they are now
+							initialPanServoPulse = panServoPulse;
+							initialTiltServoPulse = tiltServoPulse;
+							
+							// Reset our interpolation tick
+							smoothingTick = 0;
+						}
+					}
+					// CRC is bad
+					else 
+					{
+						// Update crc error counter
+						crcErrorCountUplink++;
+						badHappened = 1;
+						
+						// Chop off head
+						memcpy(uplinkFrame, &uplinkFrame[2], uplinkFrameIndex-2);
+						uplinkFrameIndex-=2;
+						
+						// Trim bad bytes til next header
+						scoot(uplinkFrame, &uplinkFrameIndex);
+				}
+					
+					break;
+						
+					// Unknown packet type, must be out of sync
+				default:
+					isFrameInSync = 0;
+					break;
+			}
+
+		}
+		
 		
 		if(gTickCount%2==0) // 50Hz
 		{
@@ -249,7 +311,7 @@ int main(void)
 			memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
 			downlinkFrameIndex += sizeof(crc);
 			
-			UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
+			//UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
 			LED_TOGGLE(YELLOW);
 		}
 		

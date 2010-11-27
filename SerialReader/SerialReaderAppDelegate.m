@@ -12,7 +12,7 @@
 
 #define HEADER_SIZE 2
 #define CRC_SIZE 2
-#define PAYLOAD_SIZE_HEADTRACKER 4
+#define PAYLOAD_SIZE_HEADTRACKER 5
 #define PACKET_SIZE_HEADTRACKER HEADER_SIZE + PAYLOAD_SIZE_HEADTRACKER + CRC_SIZE
 
 NSString * const KeyServoPulseMinPan = @"PanServoMinPulse";
@@ -92,7 +92,7 @@ void trimToHeader(unsigned char* buffer, unsigned char* index)
 	*index = 0;
 }
 
-#define PRINTRX 0
+#define PRINTRX 1
 
 - (void)downlinkReaderLoop
 {
@@ -321,6 +321,9 @@ void trimToHeader(unsigned char* buffer, unsigned char* index)
 	
 	memcpy(&buffer[offset], &header, sizeof(header));
 	offset += sizeof(header);
+	
+	buffer[offset] = 0x32;
+	offset += 1;
 	
 	memcpy(&buffer[offset], &servoPulseHeading, sizeof(short));
 	offset += sizeof(short);
