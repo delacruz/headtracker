@@ -18,9 +18,8 @@
 volatile uint16_t gMeasuredPulseWidth = 1500;
 char gNewCommandAvailable = 0;
 char gBadHappened = 0;
+
 uint16_t gCrcErrorCountUplink = 0;
-
-
 
 char Sync(unsigned char* buffer, unsigned char* index);
 char Sync(unsigned char* buffer, unsigned char* index)
