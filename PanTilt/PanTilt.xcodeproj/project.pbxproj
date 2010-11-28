@@ -9,6 +9,9 @@
 /* Begin PBXFileReference section */
 		4079525E0CEA38CC00E202DC /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		4079525F0CEA38CC00E202DC /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		962E4AE312A1C5D100F49118 /* headtracker_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = headtracker_defs.h; sourceTree = "<group>"; };
+		962E4AEB12A1C74C00F49118 /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc.h; sourceTree = "<group>"; };
+		962E4AEC12A1C74C00F49118 /* crc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc.c; sourceTree = "<group>"; };
 		969CFC8C128246A30009DF8C /* a2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = a2d.h; sourceTree = "<group>"; };
 		969CFC8D128246A30009DF8C /* a2d_10.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = a2d_10.c; sourceTree = "<group>"; };
 		969CFC8E128246A30009DF8C /* a2d_8.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = a2d_8.c; sourceTree = "<group>"; };
@@ -75,6 +78,9 @@
 			children = (
 				4079525F0CEA38CC00E202DC /* Makefile */,
 				4079525E0CEA38CC00E202DC /* main.c */,
+				962E4AE312A1C5D100F49118 /* headtracker_defs.h */,
+				962E4AEB12A1C74C00F49118 /* crc.h */,
+				962E4AEC12A1C74C00F49118 /* crc.c */,
 			);
 			path = firmware;
 			sourceTree = "<group>";
