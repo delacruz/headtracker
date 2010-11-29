@@ -40,8 +40,6 @@
 
 #define CFG_USE_ADC 1
 
-#define CFG_TIMER_MS_TICK 1
-
 #define CFG_RCI_TIMER	3
 
 
