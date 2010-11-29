@@ -303,7 +303,7 @@
 							<real>224</real>
 						</array>
 						<key>RubberWindowFrame</key>
-						<string>406 39 1105 914 0 0 1680 1028 </string>
+						<string>68 114 1105 914 0 0 1680 1028 </string>
 					</dict>
 					<key>Module</key>
 					<string>PBXSmartGroupTreeModule</string>
@@ -333,7 +333,7 @@
 										<key>_historyCapacity</key>
 										<integer>0</integer>
 										<key>bookmark</key>
-										<string>962E4B9E12A1DF2100F49118</string>
+										<string>96536BEF12A37602006F372A</string>
 										<key>history</key>
 										<array>
 											<string>96172216122F4525009030C7</string>
@@ -357,7 +357,7 @@
 											<string>9611CBB4128CE11800401CC7</string>
 											<string>96C3D88A12933DD100803C35</string>
 											<string>962BA0F01294D6DA0060C276</string>
-											<string>962E49FA12A16D2000F49118</string>
+											<string>96AE267212A3670500C86724</string>
 										</array>
 									</dict>
 									<key>SplitCount</key>
@@ -371,7 +371,7 @@
 								<key>Frame</key>
 								<string>{{0, 0}, {859, 868}}</string>
 								<key>RubberWindowFrame</key>
-								<string>406 39 1105 914 0 0 1680 1028 </string>
+								<string>68 114 1105 914 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>PBXNavigatorGroup</string>
@@ -391,7 +391,7 @@
 								<key>Frame</key>
 								<string>{{0, 873}, {859, 0}}</string>
 								<key>RubberWindowFrame</key>
-								<string>406 39 1105 914 0 0 1680 1028 </string>
+								<string>68 114 1105 914 0 0 1680 1028 </string>
 							</dict>
 							<key>Module</key>
 							<string>XCDetailModule</string>
@@ -415,9 +415,9 @@
 			</array>
 			<key>TableOfContents</key>
 			<array>
-				<string>962E49D112A1697C00F49118</string>
+				<string>96536BE012A368BA006F372A</string>
 				<string>1CE0B1FE06471DED0097A5F4</string>
-				<string>962E49D212A1697C00F49118</string>
+				<string>96536BE112A368BA006F372A</string>
 				<string>1CE0B20306471E060097A5F4</string>
 				<string>1CE0B20506471E060097A5F4</string>
 			</array>
@@ -555,15 +555,15 @@
 	<integer>5</integer>
 	<key>WindowOrderList</key>
 	<array>
-		<string>962E49DC12A1697C00F49118</string>
-		<string>962E49DD12A1697C00F49118</string>
+		<string>96536BEB12A368BA006F372A</string>
+		<string>96536BEC12A368BA006F372A</string>
 		<string>96172222122F4525009030C7</string>
 		<string>1CD10A99069EF8BA00B06720</string>
-		<string>1C78EAAD065D492600B07095</string>
 		<string>/Users/jason/Projects/headtracker/SerialReader/SerialReader.xcodeproj</string>
+		<string>1C78EAAD065D492600B07095</string>
 	</array>
 	<key>WindowString</key>
-	<string>406 39 1105 914 0 0 1680 1028 </string>
+	<string>68 114 1105 914 0 0 1680 1028 </string>
 	<key>WindowToolsV3</key>
 	<array>
 		<dict>
@@ -640,7 +640,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>96172222122F4525009030C7</string>
-				<string>962E49D312A1697C00F49118</string>
+				<string>96536BE212A368BA006F372A</string>
 				<string>1CD0528F0623707200166675</string>
 				<string>XCMainBuildResultsModuleGUID</string>
 			</array>
@@ -762,13 +762,13 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1CD10A99069EF8BA00B06720</string>
-				<string>962E49D412A1697C00F49118</string>
+				<string>96536BE312A368BA006F372A</string>
 				<string>1C162984064C10D400B95A72</string>
-				<string>962E49D512A1697C00F49118</string>
-				<string>962E49D612A1697C00F49118</string>
-				<string>962E49D712A1697C00F49118</string>
-				<string>962E49D812A1697C00F49118</string>
-				<string>962E49D912A1697C00F49118</string>
+				<string>96536BE412A368BA006F372A</string>
+				<string>96536BE512A368BA006F372A</string>
+				<string>96536BE612A368BA006F372A</string>
+				<string>96536BE712A368BA006F372A</string>
+				<string>96536BE812A368BA006F372A</string>
 			</array>
 			<key>ToolbarConfiguration</key>
 			<string>xcode.toolbar.config.debugV3</string>
@@ -924,7 +924,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>1C78EAAD065D492600B07095</string>
-				<string>962E49DA12A1697C00F49118</string>
+				<string>96536BE912A368BA006F372A</string>
 				<string>1C78EAAC065D492600B07095</string>
 			</array>
 			<key>ToolbarConfiguration</key>
@@ -1425,7 +1425,7 @@
 			<key>TableOfContents</key>
 			<array>
 				<string>96E513711244716200E2C83F</string>
-				<string>968C6431128813C4004C949E</string>
+				<string>96F2867912A1F562007D09FA</string>
 				<string>96E513701244716200E2C83F</string>
 			</array>
 			<key>WindowString</key>

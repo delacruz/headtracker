@@ -66,7 +66,7 @@ NSString * const KeyServoPulseMaxTilt = @"TiltServoMaxPulse";
 	[pool drain];
 }
 
-void trimToHeader(unsigned char* buffer, unsigned char* index)
+void Sync(unsigned char* buffer, unsigned char* index)
 {
 	// Discard bytes until a header is found
 	int i;
@@ -120,7 +120,7 @@ void trimToHeader(unsigned char* buffer, unsigned char* index)
 		memcpy(&downlinkFrame[downlinkFrameIndex], buffer, numBytesRead);
 		downlinkFrameIndex += numBytesRead;
 		
-		trimToHeader(downlinkFrame, &downlinkFrameIndex);
+		Sync(downlinkFrame, &downlinkFrameIndex);
 		
 		// Handle all packets in buffer
 		while (downlinkFrameIndex >= SIZE_FULL_FRAME) 
@@ -171,7 +171,7 @@ void trimToHeader(unsigned char* buffer, unsigned char* index)
 				// Chop head
 				memcpy(downlinkFrame, &downlinkFrame[2], downlinkFrameIndex-2);
 				downlinkFrameIndex -= 2;
-				trimToHeader(downlinkFrame, &downlinkFrameIndex);
+				Sync(downlinkFrame, &downlinkFrameIndex);
 			}
 		}
 		
