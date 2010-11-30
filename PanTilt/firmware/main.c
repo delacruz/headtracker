@@ -30,7 +30,7 @@ char Sync(unsigned char* buffer, unsigned char* index);
 char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index);
 void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr, uint16_t* targetPanServoPulsePtr, uint16_t* targetTiltServoPulsePtr);
 void SendDownlinkPacket(void);
-int16_t GetSignalReport(void);
+uint8_t GetSignalReport(void);
 
 int main(void)
 {
@@ -70,6 +70,15 @@ int main(void)
 	// Open UART
     fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	
+	/* 
+	// Configure for 115200 baud
+	MODEM_COMMAND_MODE(ON);
+	UART0_PutChar(0x15);
+	UART0_PutChar(0x07);
+	UART0_PutChar(0x08);
+	Delay10uSec(12);
+	MODEM_COMMAND_MODE(OFF);
+	 */
 	
 	// Main Loop
     while(1)
@@ -112,7 +121,7 @@ int main(void)
 		// Process 50Hz Activities
 		if(gTickCount%2==0)
 		{
-			printf("\nThe signal strength is %hu dB",GetSignalReport());
+			
 			// Blink blue light if we received a valid packet
 			if (gNewCommandAvailable) 
 			{
@@ -143,7 +152,6 @@ int main(void)
 		// Process 2Hz Activities
 		if(gTickCount%50==0) // 2Hz
 		{
-			
 			SendDownlinkPacket();
 			LED_TOGGLE(YELLOW);
 		}
@@ -151,6 +159,8 @@ int main(void)
 		if (gTickCount%200==0) {
 			
 		}
+		
+		
 		
 		// If new servo command has been processed, reset interpolation
 		if (resetInterpolation && gTickCount != tickLastValidUplinkPacket) 
@@ -319,7 +329,7 @@ void MissingPulse( void )
 
 void SendDownlinkPacket()
 {
-	unsigned char downlinkFrame[255];
+	uint8_t downlinkFrame[255];
 	unsigned char downlinkFrameIndex=0;
 	
 	uint16_t header = 0xbeef;
@@ -330,8 +340,11 @@ void SendDownlinkPacket()
 	memcpy(&downlinkFrame[downlinkFrameIndex], &gCrcErrorCountUplink, sizeof(gCrcErrorCountUplink));
 	downlinkFrameIndex += sizeof(gCrcErrorCountUplink);
 	
+	downlinkFrame[downlinkFrameIndex] = GetSignalReport();
+	downlinkFrameIndex++;
+	
 	uint16_t crc = 0xffff;
-	crc = crc16_array_update(&downlinkFrame[2], 2);
+	crc = crc16_array_update(&downlinkFrame[2], UPLINK_REPORT_PACKET_SIZE-HEADER_SIZE-CRC_SIZE);
 	
 	memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
 	downlinkFrameIndex += sizeof(crc);
@@ -342,19 +355,31 @@ void SendDownlinkPacket()
 	//		printf("%2X ", downlinkFrame[i]);
 	//	}
 	
-	//UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
+	UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
 }
 
-int16_t GetSignalReport(void)
+uint8_t GetSignalReport(void)
 {
-	PORTC |= (1<<1);
-	Delay100uSec(4);
-	UART0_PutChar(0xB6);
-	uint8_t a = UART0_GetChar();
-	uint8_t b = UART0_GetChar();
-	Delay100uSec(4);
-	PORTC &= ~(1<<1);
+	// Enter Xtend modem's binary command mode
+	MODEM_COMMAND_MODE(ON);
 	
-	int16_t decibel = (a << 0) | (b << 7);
-	return decibel;
+	// Query Signal strength: 0x36 | 0x80 = 0xB6
+	UART0_PutChar(0xB6);
+	
+	// Read LSB
+	uint8_t lsb = UART0_GetChar();
+	
+	// Read MSB
+	uint8_t msb = UART0_GetChar();
+	
+	// Minimum 100uSec wait after command as per page 18 Xtend OEM manual
+	// TODO: May not be necessary as being waited on by GetChar()
+	Delay100uSec(2);
+	
+	// Exit Xtend modem's binary command mode
+	MODEM_COMMAND_MODE(OFF);
+	
+	// Xtend return 0x8000 when not yet sampled, otherwise returns
+	//  value between 40 and 110, unsigned.
+	return (msb == 0x80) ? 0xFF : lsb;
 }

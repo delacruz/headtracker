@@ -92,11 +92,11 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	*index = 0;
 }
 
-#define PRINTRX 1
+#define PRINTRX 0
 
 - (void)downlinkReaderLoop
 {
-	const int SIZE_FULL_FRAME = 6;
+	const int SIZE_FULL_FRAME = 7;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	unsigned char downlinkFrame[255];
 	unsigned char buffer[255];
@@ -147,6 +147,12 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				memcpy(&uplinkCrcErrorCount, ptr, sizeof(uplinkCrcErrorCount));
 				ptr += sizeof(uplinkCrcErrorCount);
 				[downlinkPacketCrcReportLabel setIntValue:uplinkCrcErrorCount];
+				
+				// Read the signal strength
+				unsigned char signalStrength;
+				memcpy(&signalStrength, ptr, sizeof(signalStrength));
+				ptr+=sizeof(signalStrength);
+				[downlinkPacketSignalStrengthLabel setIntValue:signalStrength];
 				
 				unsigned short packetCrc;
 				memcpy(&packetCrc, ptr, sizeof(packetCrc));

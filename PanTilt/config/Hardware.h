@@ -141,7 +141,7 @@
 //--------------------------------------------------------------------------
 // UART settings
 
-#define UART0_BAUD_RATE     38400
+#define UART0_BAUD_RATE     115200 //38400
 
 #define UART_DATA_BIT_8  (( 1 << UCSZ1 ) | ( 1 << UCSZ0 ))
 #define UART_PARITY_NONE (( 0 << UPM1 )  | ( 0 << UPM0 ))

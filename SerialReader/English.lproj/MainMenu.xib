@@ -12,7 +12,7 @@
 		</object>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="372"/>
+			<integer value="615"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1558,7 +1558,7 @@
 											<object class="NSTextFieldCell" key="NSCell" id="758452996">
 												<int key="NSCellFlags">68288064</int>
 												<int key="NSCellFlags2">272761856</int>
-												<string key="NSContents">FF FF FF FF FF FF</string>
+												<string key="NSContents">FF FF FF FF FF FF FF</string>
 												<reference key="NSSupport" ref="554598091"/>
 												<reference key="NSControlView" ref="857265308"/>
 												<reference key="NSBackgroundColor" ref="227871065"/>
@@ -1597,10 +1597,26 @@
 												<reference key="NSTextColor" ref="847364631"/>
 											</object>
 										</object>
+										<object class="NSTextField" id="802032963">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{82, 27}, {38, 15}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="725102113">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">0</string>
+												<reference key="NSSupport" ref="554598091"/>
+												<reference key="NSControlView" ref="802032963"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
 										<object class="NSTextField" id="588852340">
 											<reference key="NSNextResponder" ref="463418672"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{82, 28}, {39, 15}}</string>
+											<string key="NSFrame">{{81, 6}, {39, 15}}</string>
 											<reference key="NSSuperview" ref="463418672"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="1002153056">
@@ -1616,7 +1632,7 @@
 										<object class="NSTextField" id="557543904">
 											<reference key="NSNextResponder" ref="463418672"/>
 											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{44, 29}, {27, 14}}</string>
+											<string key="NSFrame">{{43, 7}, {27, 14}}</string>
 											<reference key="NSSuperview" ref="463418672"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="NSTextFieldCell" key="NSCell" id="704992899">
@@ -1625,6 +1641,22 @@
 												<string key="NSContents">CRC</string>
 												<reference key="NSSupport" ref="26"/>
 												<reference key="NSControlView" ref="557543904"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
+										<object class="NSTextField" id="132545198">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{11, 28}, {60, 14}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="522760949">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">Signal (dB)</string>
+												<reference key="NSSupport" ref="26"/>
+												<reference key="NSControlView" ref="132545198"/>
 												<reference key="NSBackgroundColor" ref="227871065"/>
 												<reference key="NSTextColor" ref="847364631"/>
 											</object>
@@ -3326,6 +3358,22 @@
 					</object>
 					<int key="connectionID">788</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">downlinkPacketSignalStrength</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="802032963"/>
+					</object>
+					<int key="connectionID">795</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">downlinkPacketSignalStrengthLabel</string>
+						<reference key="source" ref="976324537"/>
+						<reference key="destination" ref="802032963"/>
+					</object>
+					<int key="connectionID">796</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -4402,10 +4450,12 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="359619630"/>
 							<reference ref="812343120"/>
-							<reference ref="588852340"/>
 							<reference ref="39252835"/>
-							<reference ref="557543904"/>
 							<reference ref="857265308"/>
+							<reference ref="588852340"/>
+							<reference ref="557543904"/>
+							<reference ref="802032963"/>
+							<reference ref="132545198"/>
 						</object>
 						<reference key="parent" ref="439893737"/>
 					</object>
@@ -5011,6 +5061,34 @@
 						<reference key="object" ref="232438935"/>
 						<reference key="parent" ref="548610485"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">791</int>
+						<reference key="object" ref="132545198"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="522760949"/>
+						</object>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">792</int>
+						<reference key="object" ref="522760949"/>
+						<reference key="parent" ref="132545198"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">793</int>
+						<reference key="object" ref="802032963"/>
+						<object class="NSMutableArray" key="children">
+							<bool key="EncodedWithXMLCoder">YES</bool>
+							<reference ref="725102113"/>
+						</object>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">794</int>
+						<reference key="object" ref="725102113"/>
+						<reference key="parent" ref="802032963"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -5342,6 +5420,10 @@
 					<string>787.IBPluginDependency</string>
 					<string>79.IBPluginDependency</string>
 					<string>79.ImportedFromIB2</string>
+					<string>791.IBPluginDependency</string>
+					<string>792.IBPluginDependency</string>
+					<string>793.IBPluginDependency</string>
+					<string>794.IBPluginDependency</string>
 					<string>80.IBPluginDependency</string>
 					<string>80.ImportedFromIB2</string>
 					<string>81.IBEditorWindowLastContentRect</string>
@@ -5686,6 +5768,10 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<integer value="1"/>
 					<string>{{452, 109}, {196, 203}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -5715,7 +5801,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">788</int>
+			<int key="maxID">796</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5746,6 +5832,7 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>centerServos:</string>
 							<string>sendBadByte:</string>
 							<string>servoCalibrationChanged:</string>
 							<string>startReadingSensorData:</string>
@@ -5753,6 +5840,7 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -5763,6 +5851,7 @@
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>centerServos:</string>
 							<string>sendBadByte:</string>
 							<string>servoCalibrationChanged:</string>
 							<string>startReadingSensorData:</string>
@@ -5770,6 +5859,10 @@
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<object class="IBActionInfo">
+								<string key="name">centerServos:</string>
+								<string key="candidateClassName">id</string>
+							</object>
 							<object class="IBActionInfo">
 								<string key="name">sendBadByte:</string>
 								<string key="candidateClassName">id</string>
@@ -5798,6 +5891,7 @@
 							<string>downlinkPacketCrcLabel</string>
 							<string>downlinkPacketCrcReportLabel</string>
 							<string>downlinkPacketFrameLabel</string>
+							<string>downlinkPacketSignalStrengthLabel</string>
 							<string>headingLabel</string>
 							<string>headingPulseLabel</string>
 							<string>headingSlider</string>
@@ -5816,6 +5910,7 @@
 							<string>NSButton</string>
 							<string>NSBox</string>
 							<string>NSBox</string>
+							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
 							<string>NSTextField</string>
@@ -5843,6 +5938,7 @@
 							<string>downlinkPacketCrcLabel</string>
 							<string>downlinkPacketCrcReportLabel</string>
 							<string>downlinkPacketFrameLabel</string>
+							<string>downlinkPacketSignalStrengthLabel</string>
 							<string>headingLabel</string>
 							<string>headingPulseLabel</string>
 							<string>headingSlider</string>
@@ -5880,6 +5976,10 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">downlinkPacketFrameLabel</string>
+								<string key="candidateClassName">NSTextField</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">downlinkPacketSignalStrengthLabel</string>
 								<string key="candidateClassName">NSTextField</string>
 							</object>
 							<object class="IBToOneOutletInfo">

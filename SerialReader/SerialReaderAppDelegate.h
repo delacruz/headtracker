@@ -34,6 +34,7 @@
 	IBOutlet NSTextField *downlinkPacketFrameLabel;
 	IBOutlet NSTextField *downlinkPacketCrcReportLabel;
 	IBOutlet NSTextField *downlinkPacketCrcLabel;
+	IBOutlet NSTextField *downlinkPacketSignalStrengthLabel;
 	
 	NSTimer *uplinkTimer;
 	

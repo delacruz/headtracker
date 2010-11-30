@@ -78,7 +78,7 @@ int open_uplink_downlink_port(void)
 		
 		tcgetattr(fd, &options);
 		
-		cfsetspeed(&options, B38400);
+		cfsetspeed(&options, B115200);
 		
 		options.c_cflag |= (CLOCAL | CREAD);
 		
