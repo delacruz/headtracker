@@ -14,6 +14,11 @@
 #include "RCInput.h" 
 #include "headtracker_defs.h"
 #include "crc.h"
+#include "Delay.h"
+
+#define ON 1
+#define OFF 0
+#define MODEM_COMMAND_MODE(state) (state ? (PORTC |= (1<<1)) : (PORTC &= ~(1<<1)))
 
 volatile uint16_t gMeasuredPulseWidth = 1500;
 char gNewCommandAvailable = 0;
@@ -25,12 +30,10 @@ char Sync(unsigned char* buffer, unsigned char* index);
 char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index);
 void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr, uint16_t* targetPanServoPulsePtr, uint16_t* targetTiltServoPulsePtr);
 void SendDownlinkPacket(void);
+int16_t GetSignalReport(void);
 
 int main(void)
 {
-	// UART handle
-	FILE   *u0;
-	
 	// Uplink & Downlink buffers
 	unsigned char uplinkBuffer[255];
 	unsigned char uplinkBufferIndex=0;
@@ -55,17 +58,18 @@ int main(void)
 	InitHardware();
 	
 	// Set 1st pin of PORTC as output, used for CFG pin of Maxstream Xtend
-	PORTC &= ~(1<<0);	// Set to off
 	DDRC |= (1<<0);		// Set as output
+	PORTC &= ~(1<<0);	// Set to off
 	
-	
+	// Set pin 2 of PORTC as output, used for SHDN sinal, must be high for xtend radio modem to be on
+	DDRC |= (1<<1);		// Set as output
+	PORTC &= ~(1<<1);	// Set to off
 	
 	InitServoTimer(3);
 	
 	// Open UART
-    u0 = fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
+    fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	
-	//tickLastValidUplinkPacket = gTickCount; // TODO: Necessary? Probly not.
 	
 	// Main Loop
     while(1)
@@ -108,6 +112,7 @@ int main(void)
 		// Process 50Hz Activities
 		if(gTickCount%2==0)
 		{
+			printf("\nThe signal strength is %hu dB",GetSignalReport());
 			// Blink blue light if we received a valid packet
 			if (gNewCommandAvailable) 
 			{
@@ -138,8 +143,13 @@ int main(void)
 		// Process 2Hz Activities
 		if(gTickCount%50==0) // 2Hz
 		{
+			
 			SendDownlinkPacket();
 			LED_TOGGLE(YELLOW);
+		}
+		
+		if (gTickCount%200==0) {
+			
 		}
 		
 		// If new servo command has been processed, reset interpolation
@@ -332,5 +342,19 @@ void SendDownlinkPacket()
 	//		printf("%2X ", downlinkFrame[i]);
 	//	}
 	
-	UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
+	//UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
+}
+
+int16_t GetSignalReport(void)
+{
+	PORTC |= (1<<1);
+	Delay100uSec(4);
+	UART0_PutChar(0xB6);
+	uint8_t a = UART0_GetChar();
+	uint8_t b = UART0_GetChar();
+	Delay100uSec(4);
+	PORTC &= ~(1<<1);
+	
+	int16_t decibel = (a << 0) | (b << 7);
+	return decibel;
 }

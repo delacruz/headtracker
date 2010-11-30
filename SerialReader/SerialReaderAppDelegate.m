@@ -92,7 +92,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	*index = 0;
 }
 
-#define PRINTRX 0
+#define PRINTRX 1
 
 - (void)downlinkReaderLoop
 {

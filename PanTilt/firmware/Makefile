@@ -17,7 +17,7 @@
 DEVICE     = atmega128
 CLOCK      = 16000000L
 PROGRAMMER = -c avrisp2 -P usb
-OBJECTS    = main.o crc.o RCInput.o Servo.o Timer.o UART.o Hardware.o
+OBJECTS    = main.o Delay.o crc.o RCInput.o Servo.o Timer.o UART.o Hardware.o
 #TODO: set fuses for atmega128
 #FUSES      = -U hfuse:w:0xd9:m -U lfuse:w:0x24:m
 # ATMega8 fuse bits (fuse bits for other devices are different!):
