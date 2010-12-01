@@ -26,17 +26,20 @@ char gBadHappened = 0;
 uint16_t gCrcErrorCountUplink = 0;
 uint16_t gRejectedFrames = 0;
 
+// Uplink & Downlink buffers
+unsigned char gUplinkBuffer[255];
+unsigned char gUplinkBufferIndex=0;
+
 char Sync(unsigned char* buffer, unsigned char* index);
 char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index);
 void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr, uint16_t* targetPanServoPulsePtr, uint16_t* targetTiltServoPulsePtr);
 void SendDownlinkPacket(void);
 uint8_t GetSignalReport(void);
+inline void ReadAllAvailableUplinkBytes(void);
 
 int main(void)
 {
-	// Uplink & Downlink buffers
-	unsigned char uplinkBuffer[255];
-	unsigned char uplinkBufferIndex=0;
+	
 
 	// Servo pulse widths
 	uint16_t initialPanServoPulse = 1500;
@@ -83,18 +86,17 @@ int main(void)
 	// Main Loop
     while(1)
 	{
-		// Get all available bytes from UART0
-		while(UART0_IsCharAvailable()) uplinkBuffer[uplinkBufferIndex++] = UART0_GetChar();
+		ReadAllAvailableUplinkBytes();
 		
 		// Sync if necessary
-		if (!isFrameInSync) isFrameInSync = Sync(uplinkBuffer, &uplinkBufferIndex);
+		if (!isFrameInSync) isFrameInSync = Sync(gUplinkBuffer, &gUplinkBufferIndex);
 
 		
 		// Process all packets in buffer
-		while (isFrameInSync && HasKnownPacketAvailable(uplinkBuffer, &uplinkBufferIndex))
+		while (isFrameInSync && HasKnownPacketAvailable(gUplinkBuffer, &gUplinkBufferIndex))
 		{
 
-			uint8_t packetType = uplinkBuffer[HEADER_SIZE];
+			uint8_t packetType = gUplinkBuffer[HEADER_SIZE];
 			
 			// Handle based on packet type
 			switch (packetType) 
@@ -102,7 +104,7 @@ int main(void)
 				case FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND:
 					
 					// Handle headtracker servo commands
-					HandleHeadtrackerCommand(uplinkBuffer, &uplinkBufferIndex, &targetPanServoPulse, &targetTiltServoPulse);
+					HandleHeadtrackerCommand(gUplinkBuffer, &gUplinkBufferIndex, &targetPanServoPulse, &targetTiltServoPulse);
 					
 					// New servo commands, reset interpolation
 					resetInterpolation = 1;
@@ -363,6 +365,9 @@ uint8_t GetSignalReport(void)
 	// Enter Xtend modem's binary command mode
 	MODEM_COMMAND_MODE(ON);
 	
+	// Read any available uplink bytes left in buffer
+	ReadAllAvailableUplinkBytes();
+	
 	// Query Signal strength: 0x36 | 0x80 = 0xB6
 	UART0_PutChar(0xB6);
 	
@@ -372,14 +377,16 @@ uint8_t GetSignalReport(void)
 	// Read MSB
 	uint8_t msb = UART0_GetChar();
 	
-	// Minimum 100uSec wait after command as per page 18 Xtend OEM manual
-	// TODO: May not be necessary as being waited on by GetChar()
-	Delay100uSec(2);
-	
 	// Exit Xtend modem's binary command mode
 	MODEM_COMMAND_MODE(OFF);
 	
 	// Xtend return 0x8000 when not yet sampled, otherwise returns
 	//  value between 40 and 110, unsigned.
 	return (msb == 0x80) ? 0xFF : lsb;
+}
+
+inline void ReadAllAvailableUplinkBytes(void)
+{
+	// Get all available bytes from UART0
+	while(UART0_IsCharAvailable()) gUplinkBuffer[gUplinkBufferIndex++] = UART0_GetChar();
 }
