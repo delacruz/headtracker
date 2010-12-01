@@ -73,15 +73,14 @@ int main(void)
 	// Open UART
     fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	
-	/* 
-	// Configure for 115200 baud
+	// Configure for  baud
 	MODEM_COMMAND_MODE(ON);
 	UART0_PutChar(0x15);
-	UART0_PutChar(0x07);
+	UART0_PutChar(0x05);
 	UART0_PutChar(0x08);
-	Delay10uSec(12);
+	Delay10uSec(20);
 	MODEM_COMMAND_MODE(OFF);
-	 */
+	
 	
 	// Main Loop
     while(1)
