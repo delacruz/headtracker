@@ -262,7 +262,11 @@ char Sync(unsigned char* buffer, unsigned char* index)
 	}
 	
 	// No header found, set index to 0
-	*index = 0;
+	if (*index!=1)  // Could be half a header
+	{
+		*index = 0;
+	}
+	
 	return 0;
 }
 
@@ -346,7 +350,7 @@ void SendDownlinkPacket()
 	downlinkFrame[downlinkFrameIndex] = GetSignalReport();
 	downlinkFrameIndex++;
 	
-	downlinkFrame[downlinkFrameIndex] = ++gDownlinkFrameCount;
+	downlinkFrame[downlinkFrameIndex] = gDownlinkFrameCount++;
 	downlinkFrameIndex++;
 	
 	uint16_t crc = 0xffff;

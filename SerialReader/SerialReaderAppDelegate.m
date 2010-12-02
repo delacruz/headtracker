@@ -89,7 +89,11 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	}
 	
 	// No header found, set index to 0
-	*index = 0;
+	if (*index!=1)  // because it could be just half the header
+	{
+		*index = 0;
+		
+	}
 }
 
 #define PRINTRX 0
@@ -102,11 +106,26 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	unsigned char buffer[255];
 	unsigned char downlinkFrameIndex = 0;
 	unsigned char numBytesRead;
+	unsigned char lastDowlinkFrameId = 0;
 	
 	while (![[NSThread currentThread] isCancelled] && serialWriteFileDescriptor != -1)
 	{
 		// Get new bytes
 		numBytesRead = read_downlink(serialWriteFileDescriptor, buffer);
+		
+		if (numBytesRead==0) {
+			NSLog(@"READ TIMEOUT! NOTHING RETURNED.....");
+		}
+		
+		NSLog(@"-----------TOP OF READER LOOP-------------");
+		
+		NSString *newBytesAsString = [[[NSString alloc]init]autorelease];
+		for(int i=0;i<numBytesRead;i++)
+		{
+			newBytesAsString = [newBytesAsString stringByAppendingFormat:@"%2X ", buffer[i]];
+		}
+		
+		NSLog(@"New from port: %@", newBytesAsString);
 		
 #if PRINTRX
 		
@@ -119,6 +138,14 @@ void Sync(unsigned char* buffer, unsigned char* index)
 		// Append to our downlink frame
 		memcpy(&downlinkFrame[downlinkFrameIndex], buffer, numBytesRead);
 		downlinkFrameIndex += numBytesRead;
+		
+		NSString * downlinkFrameAsString = [[[NSString alloc]init]autorelease];
+		for(int i=0; i<downlinkFrameIndex; i++)
+		{
+			downlinkFrameAsString = [downlinkFrameAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
+		}
+		
+		NSLog(@"Buffer appended, accumulated frame: %@",downlinkFrameAsString);
 		
 		Sync(downlinkFrame, &downlinkFrameIndex);
 		
@@ -136,10 +163,12 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				}
 				[downlinkPacketFrameLabel setStringValue:bytesAsString];
 				
+				[bytesAsString release];
+				
 				// Handle Packet
 				unsigned char *ptr = downlinkFrame;
 				
-				// Skip Header
+				// Skip Header`
 				ptr += 2;
 				
 				// Grab the reported uplink crc errors
@@ -159,6 +188,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				frameNumber = *ptr;
 				ptr++;
 				[downlinkPacketFrameNumberLabel setIntValue:frameNumber];
+				NSLog(@"%d",frameNumber);
 				
 				unsigned short packetCrc;
 				memcpy(&packetCrc, ptr, sizeof(packetCrc));
@@ -168,6 +198,25 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				// Remove the handled frame
 				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
 				downlinkFrameIndex -= SIZE_FULL_FRAME;
+				
+				NSString * downlinkFrameAfterConsumptionAsString = [[[NSString alloc]init]autorelease];
+				for(int i=0; i<downlinkFrameIndex; i++)
+				{
+					downlinkFrameAfterConsumptionAsString = [downlinkFrameAfterConsumptionAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
+				}
+				NSLog(@"Accumulated frame post-consumption: %@",downlinkFrameAfterConsumptionAsString);
+				
+				[downlinkFrameAfterConsumptionAsString release];
+				
+				unsigned char missedFrames = (frameNumber-lastDowlinkFrameId-1);
+				missedDownlinkFrameCount += missedFrames;
+				NSNumber *mdf = [NSNumber numberWithUnsignedChar:missedDownlinkFrameCount];
+				[linkDiagnosticsMissedDlFrameCountLabel setStringValue:[mdf stringValue]];
+				lastDowlinkFrameId = frameNumber;
+				if (missedFrames!=0) {
+					NSLog(@"=================>++++ MISSED FRAME!!!!! +++++<=======================");
+				}
+				
 			}
 			else 
 			{

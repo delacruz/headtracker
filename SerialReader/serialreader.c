@@ -80,7 +80,11 @@ int open_uplink_downlink_port(void)
 		
 		cfsetspeed(&options, B38400);
 		
-		options.c_cflag |= (CLOCAL | CREAD);
+		options.c_cc[VTIME] = 7;
+		
+		options.c_cc[VMIN] = 0;
+		
+		options.c_cflag |= (CLOCAL | CREAD | CS8);
 		
 		tcsetattr(fd, TCSANOW, &options);
 		

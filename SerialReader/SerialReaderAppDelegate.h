@@ -44,10 +44,13 @@
 	
 	int servoPulseMinPan, servoPulseMaxPan;
 	int servoPulseMinTilt, servoPulseMaxTilt;
+	unsigned int missedDownlinkFrameCount;
 	
 	IBOutlet NSButton *calibrateEnableButton;
 	IBOutlet NSBox *calibrationBoxPanServo;
 	IBOutlet NSBox *calibrationBoxTiltServo;
+	
+	IBOutlet NSTextField *linkDiagnosticsMissedDlFrameCountLabel;
 	
 }
 

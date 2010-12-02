@@ -194,7 +194,14 @@
 			isa = PBXProject;
 			buildConfigurationList = 4079523E0CEA382200E202DC /* Build configuration list for PBXProject "PanTilt" */;
 			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
 			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 4079523B0CEA382200E202DC;
 			projectDirPath = "";
 			projectRoot = "";
