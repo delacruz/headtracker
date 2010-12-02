@@ -37,6 +37,8 @@ void SendDownlinkPacket(void);
 uint8_t GetSignalReport(void);
 inline void ReadAllAvailableUplinkBytes(void);
 
+unsigned char gDownlinkFrameCount = 0;
+
 int main(void)
 {
 	
@@ -74,12 +76,12 @@ int main(void)
     fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	
 	// Configure for  baud
-	MODEM_COMMAND_MODE(ON);
-	UART0_PutChar(0x15);
-	UART0_PutChar(0x05);
-	UART0_PutChar(0x08);
-	Delay10uSec(20);
-	MODEM_COMMAND_MODE(OFF);
+//	MODEM_COMMAND_MODE(ON);
+//	UART0_PutChar(0x15);
+//	UART0_PutChar(0x07);
+//	UART0_PutChar(0x08);
+//	Delay10uSec(12);
+//	MODEM_COMMAND_MODE(OFF);
 	
 	
 	// Main Loop
@@ -344,6 +346,9 @@ void SendDownlinkPacket()
 	downlinkFrame[downlinkFrameIndex] = GetSignalReport();
 	downlinkFrameIndex++;
 	
+	downlinkFrame[downlinkFrameIndex] = ++gDownlinkFrameCount;
+	downlinkFrameIndex++;
+	
 	uint16_t crc = 0xffff;
 	crc = crc16_array_update(&downlinkFrame[2], UPLINK_REPORT_PACKET_SIZE-HEADER_SIZE-CRC_SIZE);
 	
@@ -360,9 +365,12 @@ void SendDownlinkPacket()
 }
 
 uint8_t GetSignalReport(void)
-{
+{	
 	// Enter Xtend modem's binary command mode
 	MODEM_COMMAND_MODE(ON);
+	
+//	// Allow modem to enter binary command state? Let's try it.
+//	Delay100uSec(2);
 	
 	// Read any available uplink bytes left in buffer
 	ReadAllAvailableUplinkBytes();

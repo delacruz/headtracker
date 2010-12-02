@@ -60,7 +60,7 @@ int open_uplink_downlink_port(void)
 {
 	int fd; /* File descriptor for the port */ 
 	
-	fd = open("/dev/tty.KeySerial1", O_RDWR | O_NOCTTY | O_NDELAY);
+	fd = open("/dev/cu.KeySerial1", O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd == -1)
 	{
 		/*

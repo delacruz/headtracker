@@ -96,7 +96,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 
 - (void)downlinkReaderLoop
 {
-	const int SIZE_FULL_FRAME = 7;
+	const int SIZE_FULL_FRAME = 8;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	unsigned char downlinkFrame[255];
 	unsigned char buffer[255];
@@ -153,6 +153,12 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				memcpy(&signalStrength, ptr, sizeof(signalStrength));
 				ptr+=sizeof(signalStrength);
 				[downlinkPacketSignalStrengthLabel setIntValue:signalStrength];
+				
+				// Read the frame number
+				unsigned char frameNumber;
+				frameNumber = *ptr;
+				ptr++;
+				[downlinkPacketFrameNumberLabel setIntValue:frameNumber];
 				
 				unsigned short packetCrc;
 				memcpy(&packetCrc, ptr, sizeof(packetCrc));
