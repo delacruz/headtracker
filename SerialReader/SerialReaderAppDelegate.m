@@ -100,7 +100,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 
 - (void)downlinkReaderLoop
 {
-	const int SIZE_FULL_FRAME = 8;
+	const int SIZE_FULL_FRAME = 9;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	unsigned char downlinkFrame[255];
 	unsigned char buffer[255];
@@ -168,7 +168,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				// Handle Packet
 				unsigned char *ptr = downlinkFrame;
 				
-				// Skip Header`
+				// Skip Header
 				ptr += 2;
 				
 				// Grab the reported uplink crc errors
@@ -182,6 +182,11 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				memcpy(&signalStrength, ptr, sizeof(signalStrength));
 				ptr+=sizeof(signalStrength);
 				[downlinkPacketSignalStrengthLabel setIntValue:signalStrength];
+				
+				// Read the AV Tx power level
+				unsigned char txPowerLevel = *ptr;
+				ptr++;
+				[downlinkPacketTxPowerLevelLabel setIntValue:txPowerLevel];
 				
 				// Read the frame number
 				unsigned char frameNumber;
@@ -305,6 +310,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	[readerThread release];
 	readerThread = nil;
 	[downlinkThread cancel];
+	sleep(5); // wait for read() to timeout
 	[downlinkThread release];
 	downlinkThread = nil;
 	close_port(serialReadFileDescriptor);

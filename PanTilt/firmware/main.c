@@ -20,6 +20,14 @@
 #define OFF 0
 #define MODEM_COMMAND_MODE(state) (state ? (PORTC |= (1<<1)) : (PORTC &= ~(1<<1)))
 
+typedef struct 
+{
+	uint8_t signalStrength;
+	uint8_t txPower;
+	uint8_t boardVoltage;
+	uint8_t boardTemperature;
+} ModemReport;
+
 volatile uint16_t gMeasuredPulseWidth = 1500;
 char gNewCommandAvailable = 0;
 char gBadHappened = 0;
@@ -33,11 +41,13 @@ unsigned char gUplinkBufferIndex=0;
 char Sync(unsigned char* buffer, unsigned char* index);
 char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index);
 void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr, uint16_t* targetPanServoPulsePtr, uint16_t* targetTiltServoPulsePtr);
-void SendDownlinkPacket(void);
-uint8_t GetSignalReport(void);
+void SendDownlinkPacket(ModemReport* modemReport);
+void QueryModemReport(ModemReport* modemReport);
 inline void ReadAllAvailableUplinkBytes(void);
 
 unsigned char gDownlinkFrameCount = 0;
+
+
 
 int main(void)
 {
@@ -59,6 +69,8 @@ int main(void)
 	char isFrameInSync = 0;
 	char resetInterpolation = 0;
 	
+	ModemReport modemReport;
+	
 	// Initialize Hardware
 	InitHardware();
 	
@@ -75,13 +87,14 @@ int main(void)
 	// Open UART
     fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	
-	// Configure for  baud
-//	MODEM_COMMAND_MODE(ON);
-//	UART0_PutChar(0x15);
-//	UART0_PutChar(0x07);
-//	UART0_PutChar(0x08);
-//	Delay10uSec(12);
-//	MODEM_COMMAND_MODE(OFF);
+	// Configure power level (parameters must be 2 bytes long)
+	MODEM_COMMAND_MODE(ON);
+	UART0_PutChar(0x3A);
+	UART0_PutChar(0x00); // Byte1
+	UART0_PutChar(0x00); // Byte2
+	UART0_PutChar(0x08);
+	Delay10uSec(12);	 // Per manual, min 100usec delay before deasserting pin
+	MODEM_COMMAND_MODE(OFF);
 	
 	
 	// Main Loop
@@ -152,18 +165,21 @@ int main(void)
 			}
 		}
 		
+//		if (gTickCount%200==0) // Query Modem Report every 2 seconds
+//		{
+//			LED_TOGGLE(YELLOW);
+//			
+//		}
+		
 		// Process 2Hz Activities
 		if(gTickCount%50==0) // 2Hz
 		{
-			SendDownlinkPacket();
+			QueryModemReport(&modemReport);
+			SendDownlinkPacket(&modemReport);
 			LED_TOGGLE(YELLOW);
 		}
 		
-		if (gTickCount%200==0) {
-			
-		}
-		
-		
+
 		
 		// If new servo command has been processed, reset interpolation
 		if (resetInterpolation && gTickCount != tickLastValidUplinkPacket) 
@@ -334,28 +350,37 @@ void MissingPulse( void )
 	LED_TOGGLE( YELLOW );
 }
 
-void SendDownlinkPacket()
+void SendDownlinkPacket(ModemReport* modemReport)
 {
 	uint8_t downlinkFrame[255];
 	unsigned char downlinkFrameIndex=0;
+	uint16_t header = 0xbeef;  // TOOD: Define elsewhere
 	
-	uint16_t header = 0xbeef;
-	
+	// Add the header
 	memcpy(downlinkFrame, &header, sizeof(header));
 	downlinkFrameIndex += sizeof(header);
 	
+	// Add bad CRC count
 	memcpy(&downlinkFrame[downlinkFrameIndex], &gCrcErrorCountUplink, sizeof(gCrcErrorCountUplink));
 	downlinkFrameIndex += sizeof(gCrcErrorCountUplink);
 	
-	downlinkFrame[downlinkFrameIndex] = GetSignalReport();
+	// Add signal strength
+	downlinkFrame[downlinkFrameIndex] = modemReport->signalStrength;
 	downlinkFrameIndex++;
 	
+	// Add current tx power level
+	downlinkFrame[downlinkFrameIndex] = modemReport->txPower;
+	downlinkFrameIndex++;
+	
+	// Addt the frame counter
 	downlinkFrame[downlinkFrameIndex] = gDownlinkFrameCount++;
 	downlinkFrameIndex++;
 	
+	// Calculate CRC
 	uint16_t crc = 0xffff;
 	crc = crc16_array_update(&downlinkFrame[2], UPLINK_REPORT_PACKET_SIZE-HEADER_SIZE-CRC_SIZE);
 	
+	// Add CRC
 	memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
 	downlinkFrameIndex += sizeof(crc);
 	
@@ -368,13 +393,10 @@ void SendDownlinkPacket()
 	UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
 }
 
-uint8_t GetSignalReport(void)
+void QueryModemReport(ModemReport* modemReport)
 {	
 	// Enter Xtend modem's binary command mode
 	MODEM_COMMAND_MODE(ON);
-	
-//	// Allow modem to enter binary command state? Let's try it.
-//	Delay100uSec(2);
 	
 	// Read any available uplink bytes left in buffer
 	ReadAllAvailableUplinkBytes();
@@ -388,12 +410,19 @@ uint8_t GetSignalReport(void)
 	// Read MSB
 	uint8_t msb = UART0_GetChar();
 	
+	// Xtend return 0x8000 when not yet sampled, otherwise returns
+	// value between 40 and 110, unsigned; this code will return 0xff
+	// if not yet sampled.
+	modemReport->signalStrength = (msb == 0x80) ? 0xFF : lsb;
+	
+	// Query Tx Power Level
+	UART0_PutChar(0x3A | 0x80);
+	
+	// Read Tx Power Level
+	modemReport->txPower = UART0_GetChar();
+	
 	// Exit Xtend modem's binary command mode
 	MODEM_COMMAND_MODE(OFF);
-	
-	// Xtend return 0x8000 when not yet sampled, otherwise returns
-	//  value between 40 and 110, unsigned.
-	return (msb == 0x80) ? 0xFF : lsb;
 }
 
 inline void ReadAllAvailableUplinkBytes(void)
