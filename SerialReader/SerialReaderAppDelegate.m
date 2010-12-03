@@ -246,6 +246,11 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	[pool drain];
 }
 
+- (IBAction)changeAvTxPowerLevel:(id)sender
+{
+	NSLog(@"you selected item with tag: %d", [sender tag]);
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	
 	// TODO: Add observer to only one struct, not three vars, easier to observe.
@@ -279,7 +284,36 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	[self didChangeValueForKey:@"servoPulseMaxTilt"];
 	
 	lockUplinkPacket = [[NSLock alloc] init]; // TODO: release this on dispose?
+	
+	NSMenu *menu = [avTxPowerButton menu];
+	[menu removeAllItems];
+	NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle:@"1 mW" action:@selector(changeAvTxPowerLevel:) keyEquivalent:@""];
+	[mi setTag:0];
+	[menu addItem:mi];
+	[mi release];
+	
+	mi = [[NSMenuItem alloc] initWithTitle:@"10 mW" action:@selector(changeAvTxPowerLevel:) keyEquivalent:@""];
+	[mi setTag:1];
+	[menu addItem:mi];
+	[mi release];
+	
+	mi = [[NSMenuItem alloc] initWithTitle:@"100 mW" action:@selector(changeAvTxPowerLevel:) keyEquivalent:@""];
+	[mi setTag:2];
+	[menu addItem:mi];
+	[mi release];
+	
+	mi = [[NSMenuItem alloc] initWithTitle:@"500 mW" action:@selector(changeAvTxPowerLevel:) keyEquivalent:@""];
+	[mi setTag:3];
+	[menu addItem:mi];
+	[mi release];
+	
+	mi = [[NSMenuItem alloc] initWithTitle:@"1000 mW" action:@selector(changeAvTxPowerLevel:) keyEquivalent:@""];
+	[mi setTag:4];
+	[menu addItem:mi];
+	[mi release];
 }
+
+
 
 - (IBAction)startReadingSensorData:(id)sender
 {

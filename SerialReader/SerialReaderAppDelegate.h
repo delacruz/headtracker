@@ -38,6 +38,8 @@
 	IBOutlet NSTextField *downlinkPacketFrameNumberLabel;
 	IBOutlet NSTextField *downlinkPacketTxPowerLevelLabel;
 	
+	IBOutlet NSPopUpButton *avTxPowerButton;
+	
 	NSTimer *uplinkTimer;
 	
 	unsigned char uplinkPacket[8];
@@ -62,5 +64,6 @@
 - (IBAction)sendBadByte:(id)sender;
 - (IBAction)servoCalibrationChanged:(id)sender;
 - (IBAction)centerServos:(id)sender;
+- (IBAction)changeAvTxPowerLevel:(id)sender;
 
 @end
