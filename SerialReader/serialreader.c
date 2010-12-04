@@ -60,7 +60,7 @@ int open_uplink_downlink_port(void)
 {
 	int fd; /* File descriptor for the port */ 
 	
-	fd = open("/dev/cu.KeySerial1", O_RDWR | O_NOCTTY | O_NDELAY);
+	fd = open("/dev/cu.KeySerial1", O_RDWR);//, O_RDWR | O_NOCTTY | O_NDELAY);
 	if (fd == -1)
 	{
 		/*
@@ -82,9 +82,9 @@ int open_uplink_downlink_port(void)
 		
 		options.c_cc[VTIME] = 7;
 		
-		options.c_cc[VMIN] = 0;
+		options.c_cc[VMIN] = 9;
 		
-		options.c_cflag |= (CLOCAL | CREAD | CS8);
+		//options.c_cflag |= (CLOCAL | CREAD | CS8);
 		
 		tcsetattr(fd, TCSANOW, &options);
 		

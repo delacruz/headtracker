@@ -112,21 +112,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	{
 		// Get new bytes
 		numBytesRead = read_downlink(serialWriteFileDescriptor, buffer);
-		
-		if (numBytesRead==0) {
-			NSLog(@"READ TIMEOUT! NOTHING RETURNED.....");
-		}
-		
-		NSLog(@"-----------TOP OF READER LOOP-------------");
-		
-		NSString *newBytesAsString = [[[NSString alloc]init]autorelease];
-		for(int i=0;i<numBytesRead;i++)
-		{
-			newBytesAsString = [newBytesAsString stringByAppendingFormat:@"%2X ", buffer[i]];
-		}
-		
-		NSLog(@"New from port: %@", newBytesAsString);
-		
+
 #if PRINTRX
 		
 		for(int i=0; i<numBytesRead; i++)
@@ -134,18 +120,32 @@ void Sync(unsigned char* buffer, unsigned char* index)
 			printf("%c", buffer[i]);
 		}
 #else
+//		if (numBytesRead==0) {
+//			NSLog(@"READ TIMEOUT! NOTHING RETURNED.....");
+//		}
+//		
+//		NSLog(@"-----------TOP OF READER LOOP-------------");
+//		
+//		NSString *newBytesAsString = [[[NSString alloc]init]autorelease];
+//		for(int i=0;i<numBytesRead;i++)
+//		{
+//			newBytesAsString = [newBytesAsString stringByAppendingFormat:@"%2X ", buffer[i]];
+//		}
+//		
+//		NSLog(@"New from port: %@", newBytesAsString);
 		
-		// Append to our downlink frame
+		
+		// Append to downlink frame
 		memcpy(&downlinkFrame[downlinkFrameIndex], buffer, numBytesRead);
 		downlinkFrameIndex += numBytesRead;
 		
-		NSString * downlinkFrameAsString = [[[NSString alloc]init]autorelease];
-		for(int i=0; i<downlinkFrameIndex; i++)
-		{
-			downlinkFrameAsString = [downlinkFrameAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
-		}
-		
-		NSLog(@"Buffer appended, accumulated frame: %@",downlinkFrameAsString);
+//		NSString * downlinkFrameAsString = [[[NSString alloc]init]autorelease];
+//		for(int i=0; i<downlinkFrameIndex; i++)
+//		{
+//			downlinkFrameAsString = [downlinkFrameAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
+//		}
+//		
+//		NSLog(@"Buffer appended, accumulated frame: %@",downlinkFrameAsString);
 		
 		Sync(downlinkFrame, &downlinkFrameIndex);
 		
@@ -193,7 +193,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				frameNumber = *ptr;
 				ptr++;
 				[downlinkPacketFrameNumberLabel setIntValue:frameNumber];
-				NSLog(@"%d",frameNumber);
+//				NSLog(@"%d",frameNumber);
 				
 				unsigned short packetCrc;
 				memcpy(&packetCrc, ptr, sizeof(packetCrc));
@@ -203,24 +203,23 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				// Remove the handled frame
 				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
 				downlinkFrameIndex -= SIZE_FULL_FRAME;
-				
-				NSString * downlinkFrameAfterConsumptionAsString = [[[NSString alloc]init]autorelease];
-				for(int i=0; i<downlinkFrameIndex; i++)
-				{
-					downlinkFrameAfterConsumptionAsString = [downlinkFrameAfterConsumptionAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
-				}
-				NSLog(@"Accumulated frame post-consumption: %@",downlinkFrameAfterConsumptionAsString);
-				
-				[downlinkFrameAfterConsumptionAsString release];
+//				
+//				NSString * downlinkFrameAfterConsumptionAsString = [[[NSString alloc]init]autorelease];
+//				for(int i=0; i<downlinkFrameIndex; i++)
+//				{
+//					downlinkFrameAfterConsumptionAsString = [downlinkFrameAfterConsumptionAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
+//				}
+//				NSLog(@"Accumulated frame post-consumption: %@",downlinkFrameAfterConsumptionAsString);
+
 				
 				unsigned char missedFrames = (frameNumber-lastDowlinkFrameId-1);
 				missedDownlinkFrameCount += missedFrames;
 				NSNumber *mdf = [NSNumber numberWithUnsignedChar:missedDownlinkFrameCount];
 				[linkDiagnosticsMissedDlFrameCountLabel setStringValue:[mdf stringValue]];
 				lastDowlinkFrameId = frameNumber;
-				if (missedFrames!=0) {
-					NSLog(@"=================>++++ MISSED FRAME!!!!! +++++<=======================");
-				}
+//				if (missedFrames!=0) {
+//					NSLog(@"=================>++++ MISSED FRAME!!!!! +++++<=======================");
+//				}
 				
 			}
 			else 
@@ -233,6 +232,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				{
 						printf("%.2X ", downlinkFrame[i]);
 				}
+				NSLog(@"");
 				
 				// Chop head
 				memcpy(downlinkFrame, &downlinkFrame[2], downlinkFrameIndex-2);
@@ -248,7 +248,30 @@ void Sync(unsigned char* buffer, unsigned char* index)
 
 - (IBAction)changeAvTxPowerLevel:(id)sender
 {
-	NSLog(@"you selected item with tag: %d", [sender tag]);
+	unsigned char buffer[128];
+	unsigned char bufferIndex=0;
+	unsigned char powerLevel = [sender tag];
+	unsigned short header = 0xbeef;
+	
+	memcpy(&buffer[bufferIndex], &header, sizeof(header));
+	bufferIndex+=sizeof(header);
+	
+	// Packet type
+	buffer[bufferIndex] = 0x33;
+	bufferIndex++;
+	
+	buffer[bufferIndex] = powerLevel;
+	bufferIndex++;
+	
+	// Calculate CRC
+	unsigned short crc = crc16_array_update(&buffer[2], bufferIndex-2); //TODO: cleanup!
+	
+	// Append CRC
+	
+	memcpy(&buffer[bufferIndex], &crc, sizeof(crc));
+	bufferIndex+=sizeof(crc);
+	
+	write_uplink(serialWriteFileDescriptor, buffer, bufferIndex);
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -329,7 +352,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 											   object:nil];
 	[downlinkThread start];
 	
-	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.05
+	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.10
 												   target: self
 												 selector: @selector(onUplinkTimer:)
 												 userInfo: nil

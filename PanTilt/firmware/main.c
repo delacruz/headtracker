@@ -41,6 +41,7 @@ unsigned char gUplinkBufferIndex=0;
 char Sync(unsigned char* buffer, unsigned char* index);
 char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index);
 void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr, uint16_t* targetPanServoPulsePtr, uint16_t* targetTiltServoPulsePtr);
+void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr);
 void SendDownlinkPacket(ModemReport* modemReport);
 void QueryModemReport(ModemReport* modemReport);
 inline void ReadAllAvailableUplinkBytes(void);
@@ -93,7 +94,7 @@ int main(void)
 	UART0_PutChar(0x00); // Byte1
 	UART0_PutChar(0x00); // Byte2
 	UART0_PutChar(0x08);
-	Delay10uSec(12);	 // Per manual, min 100usec delay before deasserting pin
+	Delay100uSec(2);	 // Per manual, min 100usec delay before deasserting pin
 	MODEM_COMMAND_MODE(OFF);
 	
 	
@@ -115,6 +116,7 @@ int main(void)
 			// Handle based on packet type
 			switch (packetType) 
 			{
+					
 				case FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND:
 					
 					// Handle headtracker servo commands
@@ -125,6 +127,14 @@ int main(void)
 					
 					// Done
 					break;
+					
+				case FRAME_TYPE_UPLINK_MODEM_CONFIG:
+						
+					//  Set Modem Configuration
+					HandleModemConfigCommand(gUplinkBuffer, &gUplinkBufferIndex);
+					
+					break;
+
 						
 					// Unknown packet type, must be out of sync
 				default:
@@ -238,6 +248,13 @@ char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index)
 			
 			break;
 			
+		case FRAME_TYPE_UPLINK_MODEM_CONFIG:
+			
+			return *index >= FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE;
+			
+			break;
+
+			
 		default:
 			
 			// Unknown frame type, must discard.  Chop head.
@@ -330,7 +347,6 @@ void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIn
 		
 		// Trim bad bytes til next header
 		Sync(uplinkFrame, uplinkFrameIndexPtr);
-		
 		
 	}
 	
@@ -429,4 +445,59 @@ inline void ReadAllAvailableUplinkBytes(void)
 {
 	// Get all available bytes from UART0
 	while(UART0_IsCharAvailable()) gUplinkBuffer[gUplinkBufferIndex++] = UART0_GetChar();
+}
+
+void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr)
+{
+	if (crc16_verify(uplinkFrame, FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE)) 
+	{
+		// Set new command flag
+		gNewCommandAvailable = 1;
+		
+		uint8_t* ptr = uplinkFrame;
+		
+		// Skip header
+		ptr+=2;
+		
+		// Skip frame type id
+		ptr++;
+		
+		// Grab Tx power level
+		uint8_t powerLevel = *ptr;
+		ptr++;
+		
+		//TODO: AUTOMATE REMOVAL OFF FRAME
+		memcpy(uplinkFrame, &uplinkFrame[FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE], *uplinkFrameIndexPtr-FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE);
+		*uplinkFrameIndexPtr-=FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE;
+		
+		
+		MODEM_COMMAND_MODE(ON);
+		UART0_PutChar(0x3A);
+		UART0_PutChar(powerLevel);
+		UART0_PutChar(0x00);
+		UART0_PutChar(0x08);
+		Delay100uSec(2);
+		MODEM_COMMAND_MODE(OFF);
+	}
+	else
+	{
+		// TODO: AUTOMATE THIS, SAME FOR ALL BAD FRAMES
+		printf("\nBad CRC on power level cmd: ");
+		
+		int i = 0;
+		for (i=0; i<FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE; i++) {
+			printf("%.2X ", uplinkFrame[i]);
+		}
+		// Update crc error counter
+		gCrcErrorCountUplink++;
+		gBadHappened = 1;
+		
+		// Chop off head
+		memcpy(uplinkFrame, &uplinkFrame[2], *uplinkFrameIndexPtr-2);
+		*uplinkFrameIndexPtr-=2;
+		
+		// Trim bad bytes til next header
+		Sync(uplinkFrame, uplinkFrameIndexPtr);
+		
+	}
 }
