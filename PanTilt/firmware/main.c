@@ -494,10 +494,10 @@ void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIn
 	}
 	else
 	{
-		int i = 0;
-		for (i=0; i<FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE; i++) {
-			printf("%.2X ", uplinkFrame[i]);
-		}
+//		int i = 0;
+//		for (i=0; i<FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE; i++) {
+//			printf("%.2X ", uplinkFrame[i]);
+//		}
 		// Update crc error counter
 		gCrcErrorCountUplink++;
 		gBadHappened = 1;
