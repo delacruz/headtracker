@@ -51,10 +51,7 @@
 	
 	IBOutlet NSButton *calibrateEnableButton;
 	IBOutlet NSBox *calibrationBoxPanServo;
-	IBOutlet NSBox *calibrationBoxTiltServo;
-	
-	IBOutlet NSTextField *linkDiagnosticsMissedDlFrameCountLabel;
-	
+	IBOutlet NSBox *calibrationBoxTiltServo;	
 }
 
 @property (assign) IBOutlet NSWindow *window;

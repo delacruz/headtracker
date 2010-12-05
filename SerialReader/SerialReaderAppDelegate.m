@@ -76,6 +76,15 @@ void Sync(unsigned char* buffer, unsigned char* index)
 		{
 			if (i != 0)  // Frame header not at start of frame
 			{
+				NSString *beefAsString = [[[NSString alloc]init]autorelease];
+				beefAsString = [beefAsString stringByAppendingString:@"Doing Sync on this: "];
+			
+				for(int j=0; j<*index; j++)
+				{
+					beefAsString = [beefAsString stringByAppendingFormat:@"%.2X ", buffer[j]];
+				}
+				NSLog(@"%@",beefAsString);
+				
 				// Move from header ownwards to start of frame
 				memcpy(buffer, &buffer[i], *index-i);
 				
@@ -106,7 +115,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	unsigned char buffer[255];
 	unsigned char downlinkFrameIndex = 0;
 	unsigned char numBytesRead;
-	unsigned char lastDowlinkFrameId = 0;
+//	unsigned char lastDowlinkFrameId = 0;
 	
 	while (![[NSThread currentThread] isCancelled] && serialWriteFileDescriptor != -1)
 	{
@@ -212,11 +221,11 @@ void Sync(unsigned char* buffer, unsigned char* index)
 //				NSLog(@"Accumulated frame post-consumption: %@",downlinkFrameAfterConsumptionAsString);
 
 				
-				unsigned char missedFrames = (frameNumber-lastDowlinkFrameId-1);
-				missedDownlinkFrameCount += missedFrames;
-				NSNumber *mdf = [NSNumber numberWithUnsignedChar:missedDownlinkFrameCount];
-				[linkDiagnosticsMissedDlFrameCountLabel setStringValue:[mdf stringValue]];
-				lastDowlinkFrameId = frameNumber;
+//				unsigned char missedFrames = (frameNumber-lastDowlinkFrameId-1);
+//				missedDownlinkFrameCount += missedFrames;
+//				NSNumber *mdf = [NSNumber numberWithUnsignedChar:missedDownlinkFrameCount];
+//				[linkDiagnosticsMissedDlFrameCountLabel setStringValue:[mdf stringValue]];
+//				lastDowlinkFrameId = frameNumber;
 //				if (missedFrames!=0) {
 //					NSLog(@"=================>++++ MISSED FRAME!!!!! +++++<=======================");
 //				}
@@ -352,7 +361,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 											   object:nil];
 	[downlinkThread start];
 	
-	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.10
+	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.05
 												   target: self
 												 selector: @selector(onUplinkTimer:)
 												 userInfo: nil

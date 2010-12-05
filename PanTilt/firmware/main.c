@@ -15,6 +15,12 @@
 #include "headtracker_defs.h"
 #include "crc.h"
 #include "Delay.h"
+#include <avr/io.h>
+#if defined( __AVR_LIBC_VERSION__ )
+#   include <avr/interrupt.h>
+#else
+#include <avr/signal.h>
+#endif
 
 #define ON 1
 #define OFF 0
@@ -43,7 +49,7 @@ char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index);
 void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr, uint16_t* targetPanServoPulsePtr, uint16_t* targetTiltServoPulsePtr);
 void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr);
 void SendDownlinkPacket(ModemReport* modemReport);
-void QueryModemReport(ModemReport* modemReport);
+inline void QueryModemReport(ModemReport* modemReport);
 inline void ReadAllAvailableUplinkBytes(void);
 
 unsigned char gDownlinkFrameCount = 0;
@@ -75,11 +81,11 @@ int main(void)
 	// Initialize Hardware
 	InitHardware();
 	
-	// Set 1st pin of PORTC as output, used for CFG pin of Maxstream Xtend
+	// Set 1st pin of PORTC as output.........
 	DDRC |= (1<<0);		// Set as output
 	PORTC &= ~(1<<0);	// Set to off
 	
-	// Set pin 2 of PORTC as output, used for SHDN sinal, must be high for xtend radio modem to be on
+	// Set pin 2 of PORTC as output, used for bin command sinal, must be high for xtend radio modem to be on
 	DDRC |= (1<<1);		// Set as output
 	PORTC &= ~(1<<1);	// Set to off
 	
@@ -88,15 +94,23 @@ int main(void)
 	// Open UART
     fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	
-	// Configure power level (parameters must be 2 bytes long)
-	MODEM_COMMAND_MODE(ON);
-	UART0_PutChar(0x3A);
-	UART0_PutChar(0x00); // Byte1
-	UART0_PutChar(0x00); // Byte2
-	UART0_PutChar(0x08);
-	Delay100uSec(2);	 // Per manual, min 100usec delay before deasserting pin
-	MODEM_COMMAND_MODE(OFF);
+//	// Configure power level (parameters must be 2 bytes long)
+//	MODEM_COMMAND_MODE(ON);
+//	UART0_PutChar(0x3A);
+//	UART0_PutChar(0x00); // Byte1
+//	UART0_PutChar(0x00); // Byte2
+//	UART0_PutChar(0x08);
+//	Delay100uSec(2);	 // Per manual, min 100usec delay before deasserting pin
+//	MODEM_COMMAND_MODE(OFF);
 	
+//	// 115200 baud
+//	MODEM_COMMAND_MODE(ON);
+//	UART0_PutChar(0x15);
+//	UART0_PutChar(0x06); // Byte1
+//	UART0_PutChar(0x00); // Byte2
+//	UART0_PutChar(0x08);
+//	Delay100uSec(2);	 // Per manual, min 100usec delay before deasserting pin
+//	MODEM_COMMAND_MODE(OFF);
 	
 	// Main Loop
     while(1)
@@ -175,16 +189,15 @@ int main(void)
 			}
 		}
 		
-//		if (gTickCount%200==0) // Query Modem Report every 2 seconds
-//		{
-//			LED_TOGGLE(YELLOW);
-//			
-//		}
+		if (gTickCount%200==0) // Query Modem Report every 2 seconds
+		{
+			QueryModemReport(&modemReport);
+		}
 		
 		// Process 2Hz Activities
 		if(gTickCount%50==0) // 2Hz
 		{
-			QueryModemReport(&modemReport);
+			
 			SendDownlinkPacket(&modemReport);
 			LED_TOGGLE(YELLOW);
 		}
@@ -409,13 +422,10 @@ void SendDownlinkPacket(ModemReport* modemReport)
 	UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
 }
 
-void QueryModemReport(ModemReport* modemReport)
+inline void QueryModemReport(ModemReport* modemReport)
 {	
 	// Enter Xtend modem's binary command mode
 	MODEM_COMMAND_MODE(ON);
-	
-	// Read any available uplink bytes left in buffer
-	ReadAllAvailableUplinkBytes();
 	
 	// Query Signal strength: 0x36 | 0x80 = 0xB6
 	UART0_PutChar(0xB6);
@@ -433,6 +443,10 @@ void QueryModemReport(ModemReport* modemReport)
 	
 	// Query Tx Power Level
 	UART0_PutChar(0x3A | 0x80);
+	// No delay here causes byte to sometimes xmit outside of command mode,
+	// delay probably allows time for buffer to raise interrupt
+	// and uart to pick tx the byte
+	Delay100uSec(3);
 	
 	// Read Tx Power Level
 	modemReport->txPower = UART0_GetChar();
@@ -470,20 +484,16 @@ void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIn
 		memcpy(uplinkFrame, &uplinkFrame[FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE], *uplinkFrameIndexPtr-FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE);
 		*uplinkFrameIndexPtr-=FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE;
 		
-		
 		MODEM_COMMAND_MODE(ON);
+		
 		UART0_PutChar(0x3A);
 		UART0_PutChar(powerLevel);
 		UART0_PutChar(0x00);
-		UART0_PutChar(0x08);
-		Delay100uSec(2);
+
 		MODEM_COMMAND_MODE(OFF);
 	}
 	else
 	{
-		// TODO: AUTOMATE THIS, SAME FOR ALL BAD FRAMES
-		printf("\nBad CRC on power level cmd: ");
-		
 		int i = 0;
 		for (i=0; i<FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE; i++) {
 			printf("%.2X ", uplinkFrame[i]);
