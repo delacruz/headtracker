@@ -13,6 +13,7 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		961721CC122DECE1009030C7 /* serialreader.c in Sources */ = {isa = PBXBuildFile; fileRef = 961721CB122DECE1009030C7 /* serialreader.c */; };
+		9623834012B325A700F277CC /* DownlinkWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9623833F12B325A700F277CC /* DownlinkWrapper.m */; };
 		96D2AF8E128749DD00715033 /* crc16.c in Sources */ = {isa = PBXBuildFile; fileRef = 96D2AF8D128749DD00715033 /* crc16.c */; };
 		96E512541244103C00E2C83F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E512531244103C00E2C83F /* OpenGL.framework */; };
 		96E512581244104700E2C83F /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E512571244104700E2C83F /* GLUT.framework */; };
@@ -33,6 +34,13 @@
 		8D1107310486CEB800E47090 /* SerialReader-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SerialReader-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* SerialReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SerialReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		961721CB122DECE1009030C7 /* serialreader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = serialreader.c; sourceTree = "<group>"; };
+		9623833E12B325A700F277CC /* DownlinkWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownlinkWrapper.h; sourceTree = "<group>"; };
+		9623833F12B325A700F277CC /* DownlinkWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownlinkWrapper.m; sourceTree = "<group>"; };
+		962D9BD112ADC12A00B2AE1D /* downlink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = downlink.h; sourceTree = "<group>"; };
+		962D9BD212ADC12A00B2AE1D /* header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = header.h; sourceTree = "<group>"; };
+		962D9BD312ADC12A00B2AE1D /* packet_kinds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = packet_kinds.h; sourceTree = "<group>"; };
+		962D9BD512ADC12A00B2AE1D /* uplink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uplink.h; sourceTree = "<group>"; };
+		962D9C6612B049D500B2AE1D /* generic_packet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = generic_packet.h; sourceTree = "<group>"; };
 		9691F84712877AAD007C7864 /* serialreader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serialreader.h; sourceTree = "<group>"; };
 		96D2AF8C128749DD00715033 /* crc16.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc16.h; sourceTree = "<group>"; };
 		96D2AF8D128749DD00715033 /* crc16.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc16.c; sourceTree = "<group>"; };
@@ -63,6 +71,8 @@
 				256AC3D90F4B6AC300CF3369 /* SerialReaderAppDelegate.m */,
 				96E5125B1244110700E2C83F /* SensorView.h */,
 				96E5125C1244110700E2C83F /* SensorView.m */,
+				9623833E12B325A700F277CC /* DownlinkWrapper.h */,
+				9623833F12B325A700F277CC /* DownlinkWrapper.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -98,6 +108,7 @@
 		29B97314FDCFA39411CA2CEA /* SerialReader */ = {
 			isa = PBXGroup;
 			children = (
+				962D9BD012ADC12A00B2AE1D /* CommonDatalink */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -138,6 +149,19 @@
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
+		};
+		962D9BD012ADC12A00B2AE1D /* CommonDatalink */ = {
+			isa = PBXGroup;
+			children = (
+				962D9BD112ADC12A00B2AE1D /* downlink.h */,
+				962D9BD212ADC12A00B2AE1D /* header.h */,
+				962D9BD312ADC12A00B2AE1D /* packet_kinds.h */,
+				962D9BD512ADC12A00B2AE1D /* uplink.h */,
+				962D9C6612B049D500B2AE1D /* generic_packet.h */,
+			);
+			name = CommonDatalink;
+			path = ../CommonDatalink;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -206,6 +230,7 @@
 				961721CC122DECE1009030C7 /* serialreader.c in Sources */,
 				96E5125D1244110700E2C83F /* SensorView.m in Sources */,
 				96D2AF8E128749DD00715033 /* crc16.c in Sources */,
+				9623834012B325A700F277CC /* DownlinkWrapper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

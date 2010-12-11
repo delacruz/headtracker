@@ -9,11 +9,8 @@
 #import "SerialReaderAppDelegate.h"
 #import "crc16.h"
 #import "serialreader.h"
-
-#define HEADER_SIZE 2
-#define CRC_SIZE 2
-#define PAYLOAD_SIZE_HEADTRACKER 5
-#define PACKET_SIZE_HEADTRACKER HEADER_SIZE + PAYLOAD_SIZE_HEADTRACKER + CRC_SIZE
+#import "uplink.h"
+#import "downlink.h"
 
 NSString * const KeyServoPulseMinPan = @"PanServoMinPulse";
 NSString * const KeyServoPulseMaxPan = @"PanServoMaxPulse";
@@ -109,13 +106,11 @@ void Sync(unsigned char* buffer, unsigned char* index)
 
 - (void)downlinkReaderLoop
 {
-	const int SIZE_FULL_FRAME = 9;
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	unsigned char downlinkFrame[255];
 	unsigned char buffer[255];
 	unsigned char downlinkFrameIndex = 0;
 	unsigned char numBytesRead;
-//	unsigned char lastDowlinkFrameId = 0;
 	
 	while (![[NSThread currentThread] isCancelled] && serialWriteFileDescriptor != -1)
 	{
@@ -129,89 +124,100 @@ void Sync(unsigned char* buffer, unsigned char* index)
 			printf("%c", buffer[i]);
 		}
 #else
-//		if (numBytesRead==0) {
-//			NSLog(@"READ TIMEOUT! NOTHING RETURNED.....");
-//		}
-//		
-//		NSLog(@"-----------TOP OF READER LOOP-------------");
-//		
-//		NSString *newBytesAsString = [[[NSString alloc]init]autorelease];
-//		for(int i=0;i<numBytesRead;i++)
-//		{
-//			newBytesAsString = [newBytesAsString stringByAppendingFormat:@"%2X ", buffer[i]];
-//		}
-//		
-//		NSLog(@"New from port: %@", newBytesAsString);
-		
-		
+
 		// Append to downlink frame
 		memcpy(&downlinkFrame[downlinkFrameIndex], buffer, numBytesRead);
 		downlinkFrameIndex += numBytesRead;
 		
-//		NSString * downlinkFrameAsString = [[[NSString alloc]init]autorelease];
-//		for(int i=0; i<downlinkFrameIndex; i++)
-//		{
-//			downlinkFrameAsString = [downlinkFrameAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
-//		}
-//		
-//		NSLog(@"Buffer appended, accumulated frame: %@",downlinkFrameAsString);
+
 		
 		Sync(downlinkFrame, &downlinkFrameIndex);
 		
 		// Handle all packets in buffer
-		while (downlinkFrameIndex >= SIZE_FULL_FRAME) 
+		while (downlinkFrameIndex >= sizeof(downlink_t_pkt)) 
 		{
-			// Check if packet is good
-			if (crc16_verify(downlinkFrame, SIZE_FULL_FRAME)) 
+			downlink_t_pkt pkt;
+			
+			memcpy(&pkt, downlinkFrame, sizeof(pkt));
+			
+			BOOL isOk = verify_crc_downlink_t_pkt(pkt);
+			
+			if (isOk) 
 			{
-				// Update GUI
+
+		        // Update GUI
 				NSString *bytesAsString = [[[NSString alloc] init] autorelease];
-				for(int i=0; i<SIZE_FULL_FRAME; i++)
+				
+				uint8_t *ptr = (uint8_t*) &pkt;
+				unsigned char len = sizeof(downlink_t_pkt);
+				while(len)
 				{
-					bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ", downlinkFrame[i]];
+					bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ", *ptr++];
+					len--;
 				}
 				[downlinkPacketFrameLabel setStringValue:bytesAsString];
 				
-				[bytesAsString release];
-				
-				// Handle Packet
-				unsigned char *ptr = downlinkFrame;
-				
-				// Skip Header
-				ptr += 2;
-				
-				// Grab the reported uplink crc errors
-				unsigned short uplinkCrcErrorCount;
-				memcpy(&uplinkCrcErrorCount, ptr, sizeof(uplinkCrcErrorCount));
-				ptr += sizeof(uplinkCrcErrorCount);
-				[downlinkPacketCrcReportLabel setIntValue:uplinkCrcErrorCount];
-				
-				// Read the signal strength
-				unsigned char signalStrength;
-				memcpy(&signalStrength, ptr, sizeof(signalStrength));
-				ptr+=sizeof(signalStrength);
-				[downlinkPacketSignalStrengthLabel setIntValue:signalStrength];
-				
-				// Read the AV Tx power level
-				unsigned char txPowerLevel = *ptr;
-				ptr++;
-				[downlinkPacketTxPowerLevelLabel setIntValue:txPowerLevel];
-				
-				// Read the frame number
-				unsigned char frameNumber;
-				frameNumber = *ptr;
-				ptr++;
-				[downlinkPacketFrameNumberLabel setIntValue:frameNumber];
+			}
+			else {
+				NSLog(@"Bad donwnlink crc.");
+			}
+
+			
+			// Remove the handled frame
+			memcpy(downlinkFrame, &downlinkFrame[sizeof(downlink_t_pkt)], downlinkFrameIndex-sizeof(downlink_t_pkt));
+			downlinkFrameIndex -= sizeof(downlink_t_pkt);
+			
+			// Check if packet is good
+//			if (crc16_verify(downlinkFrame, SIZE_FULL_FRAME)) 
+//			{
+//				// Update GUI
+//				NSString *bytesAsString = [[[NSString alloc] init] autorelease];
+//				for(int i=0; i<SIZE_FULL_FRAME; i++)
+//				{
+//					bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ", downlinkFrame[i]];
+//				}
+//				[downlinkPacketFrameLabel setStringValue:bytesAsString];
+//				
+//				[bytesAsString release];
+//				
+//				// Handle Packet
+//				unsigned char *ptr = downlinkFrame;
+//				
+//				// Skip Header
+//				ptr += 2;
+//				
+//				// Grab the reported uplink crc errors
+//				unsigned short uplinkCrcErrorCount;
+//				memcpy(&uplinkCrcErrorCount, ptr, sizeof(uplinkCrcErrorCount));
+//				ptr += sizeof(uplinkCrcErrorCount);
+//				[downlinkPacketCrcReportLabel setIntValue:uplinkCrcErrorCount];
+//				
+//				// Read the signal strength
+//				unsigned char signalStrength;
+//				memcpy(&signalStrength, ptr, sizeof(signalStrength));
+//				ptr+=sizeof(signalStrength);
+//				[downlinkPacketSignalStrengthLabel setIntValue:signalStrength];
+//				
+//				// Read the AV Tx power level
+//				unsigned char txPowerLevel = *ptr;
+//				ptr++;
+//				[downlinkPacketTxPowerLevelLabel setIntValue:txPowerLevel];
+//				
+//				// Read the frame number
+//				unsigned char frameNumber;
+//				frameNumber = *ptr;
+//				ptr++;
+//				[downlinkPacketFrameNumberLabel setIntValue:frameNumber];
 //				NSLog(@"%d",frameNumber);
-				
-				unsigned short packetCrc;
-				memcpy(&packetCrc, ptr, sizeof(packetCrc));
-				ptr+=sizeof(packetCrc);
-				[downlinkPacketCrcLabel setIntValue:packetCrc];
-				
-				// Remove the handled frame
-				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
-				downlinkFrameIndex -= SIZE_FULL_FRAME;
+//				
+//				unsigned short packetCrc;
+//				memcpy(&packetCrc, ptr, sizeof(packetCrc));
+//				ptr+=sizeof(packetCrc);
+//				[downlinkPacketCrcLabel setIntValue:packetCrc];
+//				
+//				// Remove the handled frame
+//				memcpy(downlinkFrame, &downlinkFrame[SIZE_FULL_FRAME], downlinkFrameIndex-SIZE_FULL_FRAME);
+//				downlinkFrameIndex -= SIZE_FULL_FRAME;
 //				
 //				NSString * downlinkFrameAfterConsumptionAsString = [[[NSString alloc]init]autorelease];
 //				for(int i=0; i<downlinkFrameIndex; i++)
@@ -219,8 +225,8 @@ void Sync(unsigned char* buffer, unsigned char* index)
 //					downlinkFrameAfterConsumptionAsString = [downlinkFrameAfterConsumptionAsString stringByAppendingFormat:@"%2X ", downlinkFrame[i]];
 //				}
 //				NSLog(@"Accumulated frame post-consumption: %@",downlinkFrameAfterConsumptionAsString);
-
-				
+//
+//				
 //				unsigned char missedFrames = (frameNumber-lastDowlinkFrameId-1);
 //				missedDownlinkFrameCount += missedFrames;
 //				NSNumber *mdf = [NSNumber numberWithUnsignedChar:missedDownlinkFrameCount];
@@ -229,25 +235,25 @@ void Sync(unsigned char* buffer, unsigned char* index)
 //				if (missedFrames!=0) {
 //					NSLog(@"=================>++++ MISSED FRAME!!!!! +++++<=======================");
 //				}
-				
-			}
-			else 
-			{
-				// TODO: increment some counter
-				
-				NSLog(@"Downlink bad CRC (below)");
-				
-				for(int i=0; i<SIZE_FULL_FRAME; i++)
-				{
-						printf("%.2X ", downlinkFrame[i]);
-				}
-				NSLog(@"");
-				
-				// Chop head
-				memcpy(downlinkFrame, &downlinkFrame[2], downlinkFrameIndex-2);
-				downlinkFrameIndex -= 2;
-				Sync(downlinkFrame, &downlinkFrameIndex);
-			}
+//				
+//			}
+//			else 
+//			{
+//				// TODO: increment some counter
+//				
+//				NSLog(@"Downlink bad CRC (below)");
+//				
+//				for(int i=0; i<SIZE_FULL_FRAME; i++)
+//				{
+//						printf("%.2X ", downlinkFrame[i]);
+//				}
+//				NSLog(@"");
+//				
+//				// Chop head
+//				memcpy(downlinkFrame, &downlinkFrame[2], downlinkFrameIndex-2);
+//				downlinkFrameIndex -= 2;
+//				Sync(downlinkFrame, &downlinkFrameIndex);
+//			}
 		}
 		
 #endif
@@ -257,30 +263,15 @@ void Sync(unsigned char* buffer, unsigned char* index)
 
 - (IBAction)changeAvTxPowerLevel:(id)sender
 {
-	unsigned char buffer[128];
-	unsigned char bufferIndex=0;
-	unsigned char powerLevel = [sender tag];
-	unsigned short header = 0xbeef;
+	// Create message
+	modem_cmd_t cmd;
+	cmd.tx_power_level = [sender tag];
 	
-	memcpy(&buffer[bufferIndex], &header, sizeof(header));
-	bufferIndex+=sizeof(header);
+	// Create packet
+	modem_cmd_t_pkt pkt = create_modem_cmd_t_pkt(cmd);
 	
-	// Packet type
-	buffer[bufferIndex] = 0x33;
-	bufferIndex++;
-	
-	buffer[bufferIndex] = powerLevel;
-	bufferIndex++;
-	
-	// Calculate CRC
-	unsigned short crc = crc16_array_update(&buffer[2], bufferIndex-2); //TODO: cleanup!
-	
-	// Append CRC
-	
-	memcpy(&buffer[bufferIndex], &crc, sizeof(crc));
-	bufferIndex+=sizeof(crc);
-	
-	write_uplink(serialWriteFileDescriptor, buffer, bufferIndex);
+	// Send packet
+	write_uplink(serialWriteFileDescriptor, &pkt, sizeof(pkt));
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -361,7 +352,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 											   object:nil];
 	[downlinkThread start];
 	
-	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.05
+	uplinkTimer = [NSTimer scheduledTimerWithTimeInterval: 0.1
 												   target: self
 												 selector: @selector(onUplinkTimer:)
 												 userInfo: nil
@@ -444,46 +435,35 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	prevPitch = pitch;
 	
 #pragma mark Build and Send Uplink Packet
+	
+	headtracker_cmd_t cmd;
+	cmd.pan_servo_pulse = servoPulseHeading;
+	cmd.tilt_servo_pulse = servoPulsePitch;
+	
+	headtracker_cmd_t_pkt pkt = create_headtracker_cmd_t_pkt(cmd);
+	
+	[uplinkPacketCrcLabel setIntValue:pkt.crc];
 
-	ushort header = 0xBEEF;
-	
-	// TODO: Make "Prepare Packet" routine, takes payload, payload type, returns full prepared packet with crc.
-	
-	unsigned char buffer[PACKET_SIZE_HEADTRACKER];
-	int offset = 0;
-	
-	memcpy(&buffer[offset], &header, sizeof(header));
-	offset += sizeof(header);
-	
-	buffer[offset] = 0x32;
-	offset += 1;
-	
-	memcpy(&buffer[offset], &servoPulseHeading, sizeof(short));
-	offset += sizeof(short);
-	
-	memcpy(&buffer[offset], &servoPulsePitch, sizeof(short));
-	offset += sizeof(short);
-	
-	uint16_t crc = crc16_array_update(&buffer[2], PAYLOAD_SIZE_HEADTRACKER);
-	
-	// Append the crc to the end of the packet
-	memcpy(&buffer[PACKET_SIZE_HEADTRACKER-2], &crc, sizeof(crc));
-	
 	NSString *bytesAsString = [[[NSString alloc] init] autorelease];
 	
-	for(int i=0; i< PACKET_SIZE_HEADTRACKER; i++)
+	uint8_t *ptr = (uint8_t*)&pkt;
+	int length = sizeof(pkt);
+	while(length)
 	{
-		bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ",buffer[i]];
+		bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ",*ptr++];
+		length--;
 	}
-	
 	// Set GUI Uplink Frame Label
 	[uplinkpacketFrameLabel setStringValue:bytesAsString];
-	[uplinkPacketCrcLabel setIntValue:crc];
+	
+	unsigned char buffer2[9];
+	
+	memcpy(buffer2, &pkt, sizeof(pkt));
 	
 	// Ready to be sent, copy to uplinkPacket memory
 	@synchronized(lockUplinkPacket)
 	{
-		memcpy(uplinkPacket, buffer, PACKET_SIZE_HEADTRACKER);
+		memcpy(uplinkPacket, &pkt, sizeof(pkt));//, buffer, PACKET_SIZE_HEADTRACKER);
 	}
 }
 
@@ -497,7 +477,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 {
 	@synchronized(lockUplinkPacket)
 	{
-		write_uplink(serialWriteFileDescriptor, uplinkPacket, PACKET_SIZE_HEADTRACKER);
+		write_uplink(serialWriteFileDescriptor, uplinkPacket, sizeof(headtracker_cmd_t_pkt));
 	}
 }
 

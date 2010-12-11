@@ -21,6 +21,9 @@
 #else
 #include <avr/signal.h>
 #endif
+#include "uplink.h"
+#include "downlink.h"
+
 
 #define ON 1
 #define OFF 0
@@ -94,24 +97,6 @@ int main(void)
 	// Open UART
     fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
 	
-//	// Configure power level (parameters must be 2 bytes long)
-//	MODEM_COMMAND_MODE(ON);
-//	UART0_PutChar(0x3A);
-//	UART0_PutChar(0x00); // Byte1
-//	UART0_PutChar(0x00); // Byte2
-//	UART0_PutChar(0x08);
-//	Delay100uSec(2);	 // Per manual, min 100usec delay before deasserting pin
-//	MODEM_COMMAND_MODE(OFF);
-	
-//	// 115200 baud
-//	MODEM_COMMAND_MODE(ON);
-//	UART0_PutChar(0x15);
-//	UART0_PutChar(0x06); // Byte1
-//	UART0_PutChar(0x00); // Byte2
-//	UART0_PutChar(0x08);
-//	Delay100uSec(2);	 // Per manual, min 100usec delay before deasserting pin
-//	MODEM_COMMAND_MODE(OFF);
-	
 	// Main Loop
     while(1)
 	{
@@ -125,13 +110,13 @@ int main(void)
 		while (isFrameInSync && HasKnownPacketAvailable(gUplinkBuffer, &gUplinkBufferIndex))
 		{
 
-			uint8_t packetType = gUplinkBuffer[HEADER_SIZE];
+			uint8_t packetType = gUplinkBuffer[sizeof(delim_t)];
 			
 			// Handle based on packet type
 			switch (packetType) 
 			{
 					
-				case FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND:
+				case KIND_HEADTRACKER_CMD:
 					
 					// Handle headtracker servo commands
 					HandleHeadtrackerCommand(gUplinkBuffer, &gUplinkBufferIndex, &targetPanServoPulse, &targetTiltServoPulse);
@@ -142,7 +127,7 @@ int main(void)
 					// Done
 					break;
 					
-				case FRAME_TYPE_UPLINK_MODEM_CONFIG:
+				case KIND_MODEM_CMD:
 						
 					//  Set Modem Configuration
 					HandleModemConfigCommand(gUplinkBuffer, &gUplinkBufferIndex);
@@ -244,35 +229,34 @@ int main(void)
 
 char HasKnownPacketAvailable(uint8_t *buffer, uint8_t* index)
 {
-	// Must have at least a header and packet type
-	if (*index < HEADER_SIZE + 1) 
+	// Must have at least a header
+	if (*index < sizeof(header_t)) 
 	{
 		return 0;
 	}
 	
 	// Get the packet type
-	uint8_t packetType = buffer[HEADER_SIZE];
+	uint8_t packetType = buffer[sizeof(delim_t)];
 	
 	// 
 	switch (packetType) {
-		case FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND:
+		case KIND_HEADTRACKER_CMD:
 			
-			return *index >= FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE;
+			return *index >= sizeof(headtracker_cmd_t_pkt);
 			
 			break;
 			
-		case FRAME_TYPE_UPLINK_MODEM_CONFIG:
+		case KIND_MODEM_CMD:
 			
-			return *index >= FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE;
+			return *index >= sizeof(modem_cmd_t_pkt);
 			
 			break;
 
-			
 		default:
 			
 			// Unknown frame type, must discard.  Chop head.
-			memcpy(buffer, &buffer[HEADER_SIZE], *index-HEADER_SIZE);
-			*index -= HEADER_SIZE;
+			memcpy(buffer, &buffer[sizeof(delim_t)], *index-sizeof(delim_t));
+			*index -= sizeof(delim_t);
 			
 			// Re-sync
 			Sync(buffer, index);
@@ -318,51 +302,27 @@ char Sync(unsigned char* buffer, unsigned char* index)
 
 void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr, uint16_t* targetPanServoPulsePtr, uint16_t* targetTiltServoPulsePtr)
 {
-	if(crc16_verify(uplinkFrame, FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE)) 
+	headtracker_cmd_t_pkt pkt;
+	memcpy(&pkt, uplinkFrame, sizeof(headtracker_cmd_t_pkt));
+	char isOk = verify_crc_headtracker_cmd_t_pkt(pkt);
+	
+	if(isOk)
 	{
-		
-		// Set flag
 		gNewCommandAvailable = 1;
 		
-		// Handle Packet
-		uint8_t *ptr = (uint8_t*)uplinkFrame;
-		
-		// Skip Header
-		ptr+=2;
-		
-		// Skip packet-type id
-		ptr+=1;
-		
-		// Grab pan servo pulse
-		memcpy(targetPanServoPulsePtr, ptr, sizeof(*targetPanServoPulsePtr));
-		ptr += sizeof(*targetPanServoPulsePtr);
-		
-		// Grab tilt servo pulse
-		memcpy(targetTiltServoPulsePtr, ptr, sizeof(*targetTiltServoPulsePtr));
-		ptr += sizeof(*targetTiltServoPulsePtr);
-		
-		//printf("\nTarget Pan Servo Pulse: %hu\tTarget Tilt Servo Pulse: %hu", *targetPanServoPulsePtr, *targetTiltServoPulsePtr);
-		
-		// Pop the packet
-		memcpy(uplinkFrame, &uplinkFrame[FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE], *uplinkFrameIndexPtr-FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE);
-		*uplinkFrameIndexPtr-=FRAME_TYPE_UPLINK_HEADTRACKER_COMMAND_SIZE;
-		
+		*targetPanServoPulsePtr = pkt.message.pan_servo_pulse;
+		*targetTiltServoPulsePtr = pkt.message.tilt_servo_pulse;	
 	}
 	else 
 	{
-		// Update crc error counter
-		gCrcErrorCountUplink++;
 		gBadHappened = 1;
-		
-		// Chop off head
-		memcpy(uplinkFrame, &uplinkFrame[2], *uplinkFrameIndexPtr-2);
-		*uplinkFrameIndexPtr-=2;
-		
-		// Trim bad bytes til next header
-		Sync(uplinkFrame, uplinkFrameIndexPtr);
-		
+		gCrcErrorCountUplink++;
 	}
 	
+	// Pop the packet
+	memcpy(uplinkFrame, &uplinkFrame[sizeof(headtracker_cmd_t_pkt)], *uplinkFrameIndexPtr-sizeof(headtracker_cmd_t_pkt));
+	*uplinkFrameIndexPtr-=sizeof(headtracker_cmd_t_pkt);
+
 }
 
 void PulseDetected( uint8_t channel, uint16_t pulseWidth )
@@ -381,37 +341,48 @@ void MissingPulse( void )
 
 void SendDownlinkPacket(ModemReport* modemReport)
 {
-	uint8_t downlinkFrame[255];
-	unsigned char downlinkFrameIndex=0;
-	uint16_t header = 0xbeef;  // TOOD: Define elsewhere
+	downlink_t msg;
 	
-	// Add the header
-	memcpy(downlinkFrame, &header, sizeof(header));
-	downlinkFrameIndex += sizeof(header);
+	msg.bad_uplink_crc_cnt = gCrcErrorCountUplink;
+	msg.signal_strength = modemReport->signalStrength;
+	msg.tx_power_level = modemReport->txPower;
+	msg.counter = gDownlinkFrameCount++;
 	
-	// Add bad CRC count
-	memcpy(&downlinkFrame[downlinkFrameIndex], &gCrcErrorCountUplink, sizeof(gCrcErrorCountUplink));
-	downlinkFrameIndex += sizeof(gCrcErrorCountUplink);
+	downlink_t_pkt pkt = create_downlink_t_pkt(msg);
 	
-	// Add signal strength
-	downlinkFrame[downlinkFrameIndex] = modemReport->signalStrength;
-	downlinkFrameIndex++;
+	UART0_Write(&pkt, sizeof(pkt));
 	
-	// Add current tx power level
-	downlinkFrame[downlinkFrameIndex] = modemReport->txPower;
-	downlinkFrameIndex++;
-	
-	// Addt the frame counter
-	downlinkFrame[downlinkFrameIndex] = gDownlinkFrameCount++;
-	downlinkFrameIndex++;
-	
-	// Calculate CRC
-	uint16_t crc = 0xffff;
-	crc = crc16_array_update(&downlinkFrame[2], UPLINK_REPORT_PACKET_SIZE-HEADER_SIZE-CRC_SIZE);
-	
-	// Add CRC
-	memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
-	downlinkFrameIndex += sizeof(crc);
+//uint8_t downlinkFrame[255];
+//	counter;unsigned char downlinkFrameIndex=0;
+//	uint16_t header = 0xbeef;  // TOOD: Define elsewhere
+//	
+//	// Add the header
+//	memcpy(downlinkFrame, &header, sizeof(header));
+//	downlinkFrameIndex += sizeof(header);
+//	
+//	// Add bad CRC count
+//	memcpy(&downlinkFrame[downlinkFrameIndex], &gCrcErrorCountUplink, sizeof(gCrcErrorCountUplink));
+//	downlinkFrameIndex += sizeof(gCrcErrorCountUplink);
+//	
+//	// Add signal strength
+//	downlinkFrame[downlinkFrameIndex] = modemReport->signalStrength;
+//	downlinkFrameIndex++;
+//	
+//	// Add current tx power level
+//	downlinkFrame[downlinkFrameIndex] = modemReport->txPower;
+//	downlinkFrameIndex++;
+//	
+//	// Addt the frame counter
+//	downlinkFrame[downlinkFrameIndex] = gDownlinkFrameCount++;
+//	downlinkFrameIndex++;
+//	
+//	// Calculate CRC
+//	uint16_t crc = 0xffff;
+//	//crc = crc16_array_update(&downlinkFrame[2], sizeof(downlink_pkt_t)-HEADER_SIZE-CRC_SIZE);
+//	
+//	// Add CRC
+//	memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
+//	downlinkFrameIndex += sizeof(crc);
 	
 	//	int i = 0;
 	//	printf("\n DOWNLINK FRAME: ");
@@ -419,7 +390,7 @@ void SendDownlinkPacket(ModemReport* modemReport)
 	//		printf("%2X ", downlinkFrame[i]);
 	//	}
 	
-	UART0_Write(downlinkFrame, UPLINK_REPORT_PACKET_SIZE);
+	//UART0_Write(downlinkFrame, sizeo);
 }
 
 inline void QueryModemReport(ModemReport* modemReport)
@@ -463,51 +434,77 @@ inline void ReadAllAvailableUplinkBytes(void)
 
 void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIndexPtr)
 {
-	if (crc16_verify(uplinkFrame, FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE)) 
+	modem_cmd_t_pkt pkt;
+	memcpy(&pkt, uplinkFrame, sizeof(modem_cmd_t_pkt));
+	
+	char isOk = verify_crc_modem_cmd_t_pkt(pkt);
+	
+	if (isOk) 
 	{
-		// Set new command flag
 		gNewCommandAvailable = 1;
-		
-		uint8_t* ptr = uplinkFrame;
-		
-		// Skip header
-		ptr+=2;
-		
-		// Skip frame type id
-		ptr++;
-		
-		// Grab Tx power level
-		uint8_t powerLevel = *ptr;
-		ptr++;
-		
-		//TODO: AUTOMATE REMOVAL OFF FRAME
-		memcpy(uplinkFrame, &uplinkFrame[FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE], *uplinkFrameIndexPtr-FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE);
-		*uplinkFrameIndexPtr-=FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE;
 		
 		MODEM_COMMAND_MODE(ON);
 		
 		UART0_PutChar(0x3A);
-		UART0_PutChar(powerLevel);
+		UART0_PutChar(pkt.message.tx_power_level);
 		UART0_PutChar(0x00);
-
+		
 		MODEM_COMMAND_MODE(OFF);
 	}
-	else
+	else 
 	{
-//		int i = 0;
-//		for (i=0; i<FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE; i++) {
-//			printf("%.2X ", uplinkFrame[i]);
-//		}
-		// Update crc error counter
-		gCrcErrorCountUplink++;
 		gBadHappened = 1;
-		
-		// Chop off head
-		memcpy(uplinkFrame, &uplinkFrame[2], *uplinkFrameIndexPtr-2);
-		*uplinkFrameIndexPtr-=2;
-		
-		// Trim bad bytes til next header
-		Sync(uplinkFrame, uplinkFrameIndexPtr);
-		
 	}
+	
+	memcpy(uplinkFrame, &uplinkFrame[sizeof(modem_cmd_t_pkt)], *uplinkFrameIndexPtr-sizeof(modem_cmd_t_pkt));
+	*uplinkFrameIndexPtr-=sizeof(modem_cmd_t_pkt);
+
+	
+//	if (crc16_verify(uplinkFrame, FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE)) 
+//	{
+//		// Set new command flag
+//		gNewCommandAvailable = 1;
+//		
+//		uint8_t* ptr = uplinkFrame;
+//		
+//		// Skip header
+//		ptr+=2;
+//		
+//		// Skip frame type id
+//		ptr++;
+//		
+//		// Grab Tx power level
+//		uint8_t powerLevel = *ptr;
+//		ptr++;
+//		
+//		//TODO: AUTOMATE REMOVAL OFF FRAME
+//		memcpy(uplinkFrame, &uplinkFrame[FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE], *uplinkFrameIndexPtr-FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE);
+//		*uplinkFrameIndexPtr-=FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE;
+//		
+//		MODEM_COMMAND_MODE(ON);
+//		
+//		UART0_PutChar(0x3A);
+//		UART0_PutChar(powerLevel);
+//		UART0_PutChar(0x00);
+//
+//		MODEM_COMMAND_MODE(OFF);
+//	}
+//	else
+//	{
+////		int i = 0;
+////		for (i=0; i<FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE; i++) {
+////			printf("%.2X ", uplinkFrame[i]);
+////		}
+//		// Update crc error counter
+//		gCrcErrorCountUplink++;
+//		gBadHappened = 1;
+//		
+//		// Chop off head
+//		memcpy(uplinkFrame, &uplinkFrame[2], *uplinkFrameIndexPtr-2);
+//		*uplinkFrameIndexPtr-=2;
+//		
+//		// Trim bad bytes til next header
+//		Sync(uplinkFrame, uplinkFrameIndexPtr);
+//		
+//	}
 }

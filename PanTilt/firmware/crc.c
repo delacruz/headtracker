@@ -8,6 +8,7 @@
  */
 
 #include "crc.h"
+#include "header.h"
 
 char crc16_verify(const void* array, uint8_t length)
 {
@@ -16,9 +17,9 @@ char crc16_verify(const void* array, uint8_t length)
 	const uint8_t *ptr = (const uint8_t *)array;
 	
 	// Skip header
-	ptr+=HEADER_SIZE;
+	ptr+=sizeof(header_t);
 	
-	length-=(HEADER_SIZE+CRC_SIZE);
+	length-=(sizeof(header_t)+sizeof(crc_t));
 	
 	crc = crc16_array_update(ptr, length);
 	

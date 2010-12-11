@@ -9,6 +9,11 @@
 /* Begin PBXFileReference section */
 		4079525E0CEA38CC00E202DC /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		4079525F0CEA38CC00E202DC /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		962D9EAF12B0766100B2AE1D /* downlink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = downlink.h; sourceTree = "<group>"; };
+		962D9EB012B0766100B2AE1D /* generic_packet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = generic_packet.h; sourceTree = "<group>"; };
+		962D9EB112B0766100B2AE1D /* header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = header.h; sourceTree = "<group>"; };
+		962D9EB212B0766100B2AE1D /* packet_kinds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = packet_kinds.h; sourceTree = "<group>"; };
+		962D9EB312B0766100B2AE1D /* uplink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uplink.h; sourceTree = "<group>"; };
 		962E4AE312A1C5D100F49118 /* headtracker_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = headtracker_defs.h; sourceTree = "<group>"; };
 		962E4AEB12A1C74C00F49118 /* crc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc.h; sourceTree = "<group>"; };
 		962E4AEC12A1C74C00F49118 /* crc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc.c; sourceTree = "<group>"; };
@@ -66,6 +71,7 @@
 		4079523B0CEA382200E202DC = {
 			isa = PBXGroup;
 			children = (
+				962D9EAE12B0766100B2AE1D /* CommonDatalink */,
 				969CFC8B128246A30009DF8C /* common */,
 				969CFCA7128246A30009DF8C /* shared */,
 				969CFC87128246810009DF8C /* config */,
@@ -84,6 +90,19 @@
 			);
 			path = firmware;
 			sourceTree = "<group>";
+		};
+		962D9EAE12B0766100B2AE1D /* CommonDatalink */ = {
+			isa = PBXGroup;
+			children = (
+				962D9EAF12B0766100B2AE1D /* downlink.h */,
+				962D9EB012B0766100B2AE1D /* generic_packet.h */,
+				962D9EB112B0766100B2AE1D /* header.h */,
+				962D9EB212B0766100B2AE1D /* packet_kinds.h */,
+				962D9EB312B0766100B2AE1D /* uplink.h */,
+			);
+			name = CommonDatalink;
+			path = ../CommonDatalink;
+			sourceTree = SOURCE_ROOT;
 		};
 		969CFC87128246810009DF8C /* config */ = {
 			isa = PBXGroup;
