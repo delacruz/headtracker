@@ -7,7 +7,7 @@
  *
  */
 
-#include "crc.h"
+#include "crc16.h"
 #include "header.h"
 
 char crc16_verify(const void* array, uint8_t length)

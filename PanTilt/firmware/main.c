@@ -13,7 +13,7 @@
 #include "Servo.h"
 #include "RCInput.h" 
 #include "headtracker_defs.h"
-#include "crc.h"
+#include "crc16.h"
 #include "Delay.h"
 #include <avr/io.h>
 #if defined( __AVR_LIBC_VERSION__ )

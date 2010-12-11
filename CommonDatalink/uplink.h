@@ -11,6 +11,7 @@
 #define UPLINK_H
 
 #include "header.h"
+#include "crc16.h"
 #include "generic_packet.h"
 
 // Headtracker Command
