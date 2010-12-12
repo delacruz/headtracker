@@ -3606,6 +3606,70 @@
 					</object>
 					<int key="connectionID">896</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: uplinkWrapper.panServoPulse</string>
+						<reference key="source" ref="416631966"/>
+						<reference key="destination" ref="976324537"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="416631966"/>
+							<reference key="NSDestination" ref="976324537"/>
+							<string key="NSLabel">value: uplinkWrapper.panServoPulse</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">uplinkWrapper.panServoPulse</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">903</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: uplinkWrapper.tiltServoPulse</string>
+						<reference key="source" ref="77851452"/>
+						<reference key="destination" ref="976324537"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="77851452"/>
+							<reference key="NSDestination" ref="976324537"/>
+							<string key="NSLabel">value: uplinkWrapper.tiltServoPulse</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">uplinkWrapper.tiltServoPulse</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">904</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: uplinkWrapper.headtrackerCmdPktAsString</string>
+						<reference key="source" ref="933299229"/>
+						<reference key="destination" ref="976324537"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="933299229"/>
+							<reference key="NSDestination" ref="976324537"/>
+							<string key="NSLabel">value: uplinkWrapper.headtrackerCmdPktAsString</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">uplinkWrapper.headtrackerCmdPktAsString</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">907</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: downlinkWrapper.downlinkPktAsString</string>
+						<reference key="source" ref="857265308"/>
+						<reference key="destination" ref="976324537"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="857265308"/>
+							<reference key="NSDestination" ref="976324537"/>
+							<string key="NSLabel">value: downlinkWrapper.downlinkPktAsString</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">downlinkWrapper.downlinkPktAsString</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">910</int>
+				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<array key="orderedObjects">
@@ -5765,7 +5829,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">896</int>
+			<int key="maxID">910</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">

@@ -21,5 +21,6 @@
 -(unsigned char)signalStrength;
 -(unsigned char)txPowerLevel;
 -(unsigned char)counter;
+-(NSString*)downlinkPktAsString;
 
 @end

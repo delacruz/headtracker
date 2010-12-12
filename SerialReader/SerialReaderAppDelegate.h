@@ -9,6 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import "SensorView.h"
 #import "DownlinkWrapper.h"
+#import "UplinkWrapper.h"
 
 @interface SerialReaderAppDelegate : NSObject <NSApplicationDelegate> {
     NSWindow *window;
@@ -29,6 +30,7 @@
 	IBOutlet SensorView *theSensorView;
 	
 	DownlinkWrapper *downlinkWrapper;
+	UplinkWrapper *uplinkWrapper;
 	
 	IBOutlet NSTextField *headingPulseLabel;
 	IBOutlet NSTextField *pitchPulseLabel;
@@ -58,7 +60,8 @@
 }
 
 @property (assign) IBOutlet NSWindow *window;
-@property (readonly) DownlinkWrapper *downlinkWrapper;
+@property (retain) DownlinkWrapper *downlinkWrapper;
+@property (retain) UplinkWrapper *uplinkWrapper;
 
 - (IBAction)startReadingSensorData:(id)sender;
 - (IBAction)stopReadingSensorData:(id)sender;

@@ -38,4 +38,18 @@
 	return downlinkData.crc;
 }
 
+-(NSString*)downlinkPktAsString
+{
+	NSString *bytesAsString = [[[NSString alloc] init] autorelease];
+	uint8_t *ptr = (uint8_t*)&downlinkData;
+	int length = sizeof(downlinkData);
+	while(length)
+	{
+		bytesAsString = [bytesAsString stringByAppendingFormat:@"%.2X ",*ptr++];
+		length--;
+	}
+	
+	return bytesAsString;
+}
+
 @end
