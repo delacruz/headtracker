@@ -30,13 +30,8 @@ typedef struct
 	uint8_t tx_power_level;
 }PACKED modem_cmd_t;
 
-//typedef struct
-//{
-//	header_t	header;
-//	modem_cmd_t	cfg;
-//	crc_t		crc;
-//}PACKED modem_cmd_pkt_t;
-
 CREATE_PACKETIZATION_CODE(modem_cmd_t, KIND_MODEM_CMD)
+
+#undef CREATE_PACKETIZATION_CODE
 
 #endif

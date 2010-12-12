@@ -24,5 +24,6 @@ typedef struct
 
 CREATE_PACKETIZATION_CODE(downlink_t, KIND_DOWNLINK)
 																			
+#undef CREATE_PACKETIZATION_CODE
 
 #endif

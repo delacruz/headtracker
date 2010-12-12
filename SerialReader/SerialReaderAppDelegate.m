@@ -11,6 +11,7 @@
 #import "serialreader.h"
 #import "uplink.h"
 #import "downlink.h"
+#import "DownlinkWrapper.h"
 
 NSString * const KeyServoPulseMinPan = @"PanServoMinPulse";
 NSString * const KeyServoPulseMaxPan = @"PanServoMaxPulse";
@@ -20,6 +21,7 @@ NSString * const KeyServoPulseMaxTilt = @"TiltServoMaxPulse";
 @implementation SerialReaderAppDelegate
 
 @synthesize window;
+@synthesize downlinkWrapper;
 
 + (void)initialize
 {
@@ -157,6 +159,10 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				}
 				[downlinkPacketFrameLabel setStringValue:bytesAsString];
 				
+				[self willChangeValueForKey:@"downlinkWrapper"];
+				[downlinkWrapper setDownlinkData:pkt];
+				[self didChangeValueForKey:@"downlinkWrapper"];
+				
 			}
 			else {
 				NSLog(@"Bad donwnlink crc.");
@@ -275,6 +281,15 @@ void Sync(unsigned char* buffer, unsigned char* index)
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	
+	[self willChangeValueForKey:@"downlinkWrapper"];
+	downlinkWrapper = [[DownlinkWrapper alloc]init];
+	[self didChangeValueForKey:@"downlinkWrapper"];
+	
+	
+//	[self willChangeValueForKey:@"downlinkWrapper.signalStrength"];
+//	[downlinkWrapper setSignalStrength:4];
+//	[self didChangeValueForKey:@"downlinkWrapper.signalStrength"];
 	
 	// TODO: Add observer to only one struct, not three vars, easier to observe.
 	[self addObserver:self forKeyPath:@"heading" options:NSKeyValueObservingOptionOld context:nil];

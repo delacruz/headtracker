@@ -32,4 +32,5 @@ static uint8_t verify_crc_##DATATYPE##_pkt(DATATYPE##_pkt pkt)							\
 {																						\
 	return pkt.crc == crc16_array_update(&pkt.message, sizeof(pkt.message));			\
 }																						\
-																						
+														\
+

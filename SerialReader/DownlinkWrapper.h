@@ -12,12 +12,14 @@
 
 @interface DownlinkWrapper : NSObject 
 {
-	downlink_t downlinkData;
+	downlink_t_pkt downlinkData;
 }
 
-@property(readonly) unsigned short badUplinkCrcCount;
-@property(readonly) unsigned char signalStrength;
-@property(readonly) unsigned char txPowerLevel;
-@property(readonly) unsigned char counter;
+@property (readwrite, assign) downlink_t_pkt downlinkData;
+
+-(unsigned short)badUplinkCrcCount;
+-(unsigned char)signalStrength;
+-(unsigned char)txPowerLevel;
+-(unsigned char)counter;
 
 @end
