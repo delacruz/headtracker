@@ -13,6 +13,7 @@
 #import "downlink.h"
 #import "DownlinkWrapper.h"
 
+// Constants for user defaults
 NSString * const KeyServoPulseMinPan = @"PanServoMinPulse";
 NSString * const KeyServoPulseMaxPan = @"PanServoMaxPulse";
 NSString * const KeyServoPulseMinTilt = @"TiltServoMinPulse";
@@ -149,7 +150,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 				[self didChangeValueForKey:@"downlinkWrapper"];
 			}
 			else {
-				NSLog(@"Bad donwnlink crc.");
+				NSLog(@"Downlink bad CRC for packet: %@", [downlinkWrapper downlinkPktAsString]);
 			}
 			
 			// Remove the handled frame
@@ -177,7 +178,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	
+	speechSynth = [[NSSpeechSynthesizer alloc] initWithVoice:@"com.apple.speech.synthesis.voice.Victoria"];
 	self.downlinkWrapper = [[DownlinkWrapper alloc]init];
 	self.uplinkWrapper = [[UplinkWrapper alloc]init];
 	
@@ -239,6 +240,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	[mi setTag:4];
 	[menu addItem:mi];
 	[mi release];
+	
 }
 
 
@@ -303,8 +305,7 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	else if(headingDelta < -180.0) headingDelta += 360.0;
 
 	// Calculate the pan servo pulse width
-	float deltaFloat = headingDelta * ((float)(servoPulseMaxPan - servoPulseMinPan)) / 180.0;
-	calculatedPulseHeading += deltaFloat;
+	calculatedPulseHeading += headingDelta * ((float)(servoPulseMaxPan - servoPulseMinPan)) / 180.0;
 	
 	// Enforce range limit if reached
 	if(calculatedPulseHeading > servoPulseMaxPan) calculatedPulseHeading = servoPulseMaxPan;
@@ -338,29 +339,21 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	cmd.tilt_servo_pulse = servoPulsePitch;
 	headtracker_cmd_t_pkt pkt = create_headtracker_cmd_t_pkt(cmd);
 	
-	// Used for GUI databinding
-	[self willChangeValueForKey:@"uplinkWrapper"];
-	[self.uplinkWrapper setHeadtrackerCmdPkt:pkt];
-	[self didChangeValueForKey:@"uplinkWrapper"];
-	
-	// Ready to be sent, copy to uplinkPacket memory
 	@synchronized(lockUplinkPacket)
 	{
-		memcpy(uplinkPacket, &pkt, sizeof(pkt));
+		// Used for GUI databinding
+		[self willChangeValueForKey:@"uplinkWrapper"];
+		[self.uplinkWrapper setHeadtrackerCmdPkt:pkt];
+		[self didChangeValueForKey:@"uplinkWrapper"];
 	}
-}
-
-- (IBAction)sendBadByte:(id)sender
-{
-	unsigned char badness[] = {0xff};
-	write_uplink(serialWriteFileDescriptor, badness, 1);
 }
 
 - (void)onUplinkTimer:(NSTimer*)timer
 {
 	@synchronized(lockUplinkPacket)
 	{
-		write_uplink(serialWriteFileDescriptor, uplinkPacket, sizeof(headtracker_cmd_t_pkt));
+		headtracker_cmd_t_pkt pkt = uplinkWrapper.headtrackerCmdPkt;
+		write_uplink(serialWriteFileDescriptor, &pkt, sizeof(headtracker_cmd_t_pkt));
 	}
 }
 
@@ -377,7 +370,8 @@ void Sync(unsigned char* buffer, unsigned char* index)
 
 - (IBAction)centerServos:(id)sender
 {
-
+	calculatedPulsePitch = 1500.0;
+	calculatedPulsePitch = 1500.0;
 }
 
 @end

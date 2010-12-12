@@ -11,7 +11,7 @@
 			<string key="NS.object.0">823</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="615"/>
+			<integer value="687"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2064,26 +2064,6 @@
 												<int key="NSSliderType">1</int>
 											</object>
 										</object>
-										<object class="NSButton" id="968990766">
-											<reference key="NSNextResponder" ref="13502565"/>
-											<int key="NSvFlags">268</int>
-											<string key="NSFrame">{{194, 251}, {103, 28}}</string>
-											<reference key="NSSuperview" ref="13502565"/>
-											<bool key="NSEnabled">YES</bool>
-											<object class="NSButtonCell" key="NSCell" id="982151471">
-												<int key="NSCellFlags">67239424</int>
-												<int key="NSCellFlags2">134348800</int>
-												<string key="NSContents">Insert Bad</string>
-												<reference key="NSSupport" ref="26"/>
-												<reference key="NSControlView" ref="968990766"/>
-												<int key="NSButtonFlags">-2038284033</int>
-												<int key="NSButtonFlags2">129</int>
-												<string key="NSAlternateContents"/>
-												<string key="NSKeyEquivalent"/>
-												<int key="NSPeriodicDelay">200</int>
-												<int key="NSPeriodicInterval">25</int>
-											</object>
-										</object>
 										<object class="NSButton" id="548610485">
 											<reference key="NSNextResponder" ref="13502565"/>
 											<int key="NSvFlags">268</int>
@@ -3289,14 +3269,6 @@
 						<reference key="destination" ref="857265308"/>
 					</object>
 					<int key="connectionID">692</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">sendBadByte:</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="968990766"/>
-					</object>
-					<int key="connectionID">695</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
@@ -4919,7 +4891,6 @@
 							<reference ref="673902416"/>
 							<reference ref="30386987"/>
 							<reference ref="963880187"/>
-							<reference ref="968990766"/>
 							<reference ref="548610485"/>
 						</array>
 						<reference key="parent" ref="439893737"/>
@@ -5066,19 +5037,6 @@
 						<int key="objectID">573</int>
 						<reference key="object" ref="359111331"/>
 						<reference key="parent" ref="987497743"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">693</int>
-						<reference key="object" ref="968990766"/>
-						<array class="NSMutableArray" key="children">
-							<reference ref="982151471"/>
-						</array>
-						<reference key="parent" ref="845039149"/>
-					</object>
-					<object class="IBObjectRecord">
-						<int key="objectID">694</int>
-						<reference key="object" ref="982151471"/>
-						<reference key="parent" ref="968990766"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">712</int>
@@ -5713,8 +5671,6 @@
 				<string key="646.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="647.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="687.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="693.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="694.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="706.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="707.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="708.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>

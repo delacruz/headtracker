@@ -28,35 +28,19 @@
 	NSThread *readerThread;
 	NSThread *downlinkThread;
 	IBOutlet SensorView *theSensorView;
-	
 	DownlinkWrapper *downlinkWrapper;
 	UplinkWrapper *uplinkWrapper;
-	
-	IBOutlet NSTextField *headingPulseLabel;
-	IBOutlet NSTextField *pitchPulseLabel;
-	IBOutlet NSTextField *uplinkpacketFrameLabel;
-	IBOutlet NSTextField *uplinkPacketCrcLabel;
-	IBOutlet NSTextField *downlinkPacketFrameLabel;
-	IBOutlet NSTextField *downlinkPacketCrcReportLabel;
-	IBOutlet NSTextField *downlinkPacketCrcLabel;
-	IBOutlet NSTextField *downlinkPacketSignalStrengthLabel;
-	IBOutlet NSTextField *downlinkPacketFrameNumberLabel;
-	IBOutlet NSTextField *downlinkPacketTxPowerLevelLabel;
-	
 	IBOutlet NSPopUpButton *avTxPowerButton;
 	
 	NSTimer *uplinkTimer;
-	
-	unsigned char uplinkPacket[8];
+
 	NSLock *lockUplinkPacket;
 	
 	int servoPulseMinPan, servoPulseMaxPan;
 	int servoPulseMinTilt, servoPulseMaxTilt;
-	unsigned int missedDownlinkFrameCount;
 	
-	IBOutlet NSButton *calibrateEnableButton;
-	IBOutlet NSBox *calibrationBoxPanServo;
-	IBOutlet NSBox *calibrationBoxTiltServo;	
+	NSSpeechSynthesizer *speechSynth;
+
 }
 
 @property (assign) IBOutlet NSWindow *window;
@@ -65,7 +49,6 @@
 
 - (IBAction)startReadingSensorData:(id)sender;
 - (IBAction)stopReadingSensorData:(id)sender;
-- (IBAction)sendBadByte:(id)sender;
 - (IBAction)servoCalibrationChanged:(id)sender;
 - (IBAction)centerServos:(id)sender;
 - (IBAction)changeAvTxPowerLevel:(id)sender;
