@@ -264,8 +264,6 @@ ISR( RCI_CAPT_vect )
         {
             gPulseDetectedCB( gPulseIndex, pulseWidth );
         }
-		
-		LED_TOGGLE( RED );
 	}
 	
 	gPulseIndex=1;

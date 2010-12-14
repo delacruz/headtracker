@@ -28,6 +28,19 @@
 	return downlinkData.message.tx_power_level;
 }
 
+-(bool)isVideoRelayOn
+{
+	return downlinkData.message.is_video_relay_on == 1;
+}
+-(bool)isFailsafeModeOn
+{
+	return downlinkData.message.is_failsafe_mode == 1;
+}
+-(bool)isFailsafeComOk
+{
+	return downlinkData.message.is_failsafe_com_ok == 1;
+}
+
 -(unsigned char)counter
 {
 	return downlinkData.message.counter;

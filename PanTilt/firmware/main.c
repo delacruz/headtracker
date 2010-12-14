@@ -24,7 +24,6 @@
 #include "uplink.h"
 #include "downlink.h"
 
-
 #define ON 1
 #define OFF 0
 #define MODEM_COMMAND_MODE(state) (state ? (PORTC |= (1<<1)) : (PORTC &= ~(1<<1)))
@@ -37,11 +36,13 @@ typedef struct
 	uint8_t boardTemperature;
 } ModemReport;
 
-volatile uint16_t gMeasuredPulseWidth = 1500;
-char gNewCommandAvailable = 0;
-char gBadHappened = 0;
-uint16_t gCrcErrorCountUplink = 0;
-uint16_t gRejectedFrames = 0;
+volatile char gIsFailsafeModeOn		= 0;
+volatile char gIsFailsafeSignalOk	= 0;
+
+char gNewCommandAvailable			= 0;
+char gBadHappened					= 0;
+uint16_t gCrcErrorCountUplink		= 0;
+uint16_t gRejectedFrames			= 0;
 
 // Uplink & Downlink buffers
 unsigned char gUplinkBuffer[255];
@@ -54,30 +55,29 @@ void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIn
 void SendDownlinkPacket(ModemReport* modemReport);
 inline void QueryModemReport(ModemReport* modemReport);
 inline void ReadAllAvailableUplinkBytes(void);
+void PulseDetected(uint8_t channel, uint16_t pulseWidth);
+void MissingPulse(void);
 
 unsigned char gDownlinkFrameCount = 0;
 
-
-
 int main(void)
 {
-	
-
 	// Servo pulse widths
-	uint16_t initialPanServoPulse = 1500;
-	uint16_t initialTiltServoPulse = 1500;
-	uint16_t targetPanServoPulse = 1500;
-	uint16_t targetTiltServoPulse = 1500;
-	uint16_t smoothedPanServoPulse = 1500;
-	uint16_t smoothedTiltServoPulse = 1500;
+	uint16_t initialPanServoPulse	= 1500;
+	uint16_t initialTiltServoPulse	= 1500;
+	uint16_t targetPanServoPulse	= 1500;
+	uint16_t targetTiltServoPulse	= 1500;
+	uint16_t smoothedPanServoPulse	= 1500;
+	uint16_t smoothedTiltServoPulse	= 1500;
+	uint16_t videoRelayPulse		= 1000;
 	
 	// Tick vars for servo command interpolation
-	tick_t tickLastValidUplinkPacket = 0;
-	tick_t ticksBetweenPackets = 0;
-	tick_t interpolationTick = 0;
+	tick_t tickLastValidUplinkPacket	= 0;
+	tick_t ticksBetweenPackets			= 0;
+	tick_t interpolationTick			= 0;
 	
-	char isFrameInSync = 0;
-	char resetInterpolation = 0;
+	char isFrameInSync		= 0;
+	char resetInterpolation	= 0;
 	
 	ModemReport modemReport;
 	
@@ -92,7 +92,17 @@ int main(void)
 	DDRC |= (1<<1);		// Set as output
 	PORTC &= ~(1<<1);	// Set to off
 	
-	InitServoTimer(3);
+	InitServoTimer(1);
+	
+	SetServo(SERVO_1A, initialPanServoPulse);
+	SetServo(SERVO_1B, initialTiltServoPulse);
+	SetServo(SERVO_1C, videoRelayPulse);
+	
+	RCI_Init();
+	sei();
+	
+	RCI_SetPulseCallback(PulseDetected);
+	RCI_SetMissingPulseCallback(MissingPulse);
 	
 	// Open UART
     fdevopen( UART0_PutCharStdio, UART0_GetCharStdio );
@@ -187,8 +197,6 @@ int main(void)
 			LED_TOGGLE(YELLOW);
 		}
 		
-
-		
 		// If new servo command has been processed, reset interpolation
 		if (resetInterpolation && gTickCount != tickLastValidUplinkPacket) 
 		{
@@ -215,10 +223,13 @@ int main(void)
 			smoothedPanServoPulse = (uint16_t)(((int)targetPanServoPulse-(int)initialPanServoPulse) * (interpolationTick / (float)ticksBetweenPackets) + (int)initialPanServoPulse);
 			smoothedTiltServoPulse = (uint16_t)(((int)targetTiltServoPulse-(int)initialTiltServoPulse) * (interpolationTick / (float)ticksBetweenPackets) + (int)initialTiltServoPulse);
 		}
+				
+		videoRelayPulse = gIsFailsafeModeOn ? 2000 : 1000;
 
 		// Set servos
-		SetServo(SERVO_3A, smoothedPanServoPulse);
-		SetServo(SERVO_3B, smoothedTiltServoPulse);
+		SetServo(SERVO_1A, smoothedPanServoPulse);
+		SetServo(SERVO_1B, smoothedTiltServoPulse);
+		SetServo(SERVO_1C, videoRelayPulse);
 	
 		WaitForTimer0Rollover();
     }
@@ -327,16 +338,16 @@ void HandleHeadtrackerCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIn
 
 void PulseDetected( uint8_t channel, uint16_t pulseWidth )
 {
-	gMeasuredPulseWidth = pulseWidth;
+	gIsFailsafeSignalOk = 1;
+	gIsFailsafeModeOn = (pulseWidth>1500) ? 0 : 1;
 	
-	LED_TOGGLE( BLUE );
+	LED_TOGGLE(BLUE);
+	
 }
 
 void MissingPulse( void )
 {
-	//gLastChannel = 0;
-	gMeasuredPulseWidth = 6969;
-	LED_TOGGLE( YELLOW );
+	gIsFailsafeSignalOk = 0;
 }
 
 void SendDownlinkPacket(ModemReport* modemReport)
@@ -346,51 +357,15 @@ void SendDownlinkPacket(ModemReport* modemReport)
 	msg.bad_uplink_crc_cnt = gCrcErrorCountUplink;
 	msg.signal_strength = modemReport->signalStrength;
 	msg.tx_power_level = modemReport->txPower;
+	msg.is_video_relay_on = 1;//gIsFailsafeModeOn;
+	msg.is_failsafe_mode = gIsFailsafeModeOn;
+	msg.is_failsafe_com_ok = gIsFailsafeSignalOk;
 	msg.counter = gDownlinkFrameCount++;
 	
 	downlink_t_pkt pkt = create_downlink_t_pkt(msg);
 	
 	UART0_Write(&pkt, sizeof(pkt));
-	
-//uint8_t downlinkFrame[255];
-//	counter;unsigned char downlinkFrameIndex=0;
-//	uint16_t header = 0xbeef;  // TOOD: Define elsewhere
-//	
-//	// Add the header
-//	memcpy(downlinkFrame, &header, sizeof(header));
-//	downlinkFrameIndex += sizeof(header);
-//	
-//	// Add bad CRC count
-//	memcpy(&downlinkFrame[downlinkFrameIndex], &gCrcErrorCountUplink, sizeof(gCrcErrorCountUplink));
-//	downlinkFrameIndex += sizeof(gCrcErrorCountUplink);
-//	
-//	// Add signal strength
-//	downlinkFrame[downlinkFrameIndex] = modemReport->signalStrength;
-//	downlinkFrameIndex++;
-//	
-//	// Add current tx power level
-//	downlinkFrame[downlinkFrameIndex] = modemReport->txPower;
-//	downlinkFrameIndex++;
-//	
-//	// Addt the frame counter
-//	downlinkFrame[downlinkFrameIndex] = gDownlinkFrameCount++;
-//	downlinkFrameIndex++;
-//	
-//	// Calculate CRC
-//	uint16_t crc = 0xffff;
-//	//crc = crc16_array_update(&downlinkFrame[2], sizeof(downlink_pkt_t)-HEADER_SIZE-CRC_SIZE);
-//	
-//	// Add CRC
-//	memcpy(&downlinkFrame[downlinkFrameIndex], &crc, sizeof(crc));
-//	downlinkFrameIndex += sizeof(crc);
-	
-	//	int i = 0;
-	//	printf("\n DOWNLINK FRAME: ");
-	//	for (i=0; i<downlinkFrameIndex; i++) {
-	//		printf("%2X ", downlinkFrame[i]);
-	//	}
-	
-	//UART0_Write(downlinkFrame, sizeo);
+
 }
 
 inline void QueryModemReport(ModemReport* modemReport)
@@ -459,52 +434,4 @@ void HandleModemConfigCommand(unsigned char* uplinkFrame, uint8_t* uplinkFrameIn
 	memcpy(uplinkFrame, &uplinkFrame[sizeof(modem_cmd_t_pkt)], *uplinkFrameIndexPtr-sizeof(modem_cmd_t_pkt));
 	*uplinkFrameIndexPtr-=sizeof(modem_cmd_t_pkt);
 
-	
-//	if (crc16_verify(uplinkFrame, FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE)) 
-//	{
-//		// Set new command flag
-//		gNewCommandAvailable = 1;
-//		
-//		uint8_t* ptr = uplinkFrame;
-//		
-//		// Skip header
-//		ptr+=2;
-//		
-//		// Skip frame type id
-//		ptr++;
-//		
-//		// Grab Tx power level
-//		uint8_t powerLevel = *ptr;
-//		ptr++;
-//		
-//		//TODO: AUTOMATE REMOVAL OFF FRAME
-//		memcpy(uplinkFrame, &uplinkFrame[FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE], *uplinkFrameIndexPtr-FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE);
-//		*uplinkFrameIndexPtr-=FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE;
-//		
-//		MODEM_COMMAND_MODE(ON);
-//		
-//		UART0_PutChar(0x3A);
-//		UART0_PutChar(powerLevel);
-//		UART0_PutChar(0x00);
-//
-//		MODEM_COMMAND_MODE(OFF);
-//	}
-//	else
-//	{
-////		int i = 0;
-////		for (i=0; i<FRAME_TYPE_UPLINK_MODEM_CONFIG_SIZE; i++) {
-////			printf("%.2X ", uplinkFrame[i]);
-////		}
-//		// Update crc error counter
-//		gCrcErrorCountUplink++;
-//		gBadHappened = 1;
-//		
-//		// Chop off head
-//		memcpy(uplinkFrame, &uplinkFrame[2], *uplinkFrameIndexPtr-2);
-//		*uplinkFrameIndexPtr-=2;
-//		
-//		// Trim bad bytes til next header
-//		Sync(uplinkFrame, uplinkFrameIndexPtr);
-//		
-//	}
 }

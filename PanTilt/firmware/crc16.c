@@ -9,6 +9,7 @@
 
 #include "crc16.h"
 #include "header.h"
+#include <string.h>
 
 char crc16_verify(const void* array, uint8_t length)
 {

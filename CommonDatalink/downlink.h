@@ -16,10 +16,14 @@
 
 typedef struct
 {
-	uint16_t	bad_uplink_crc_cnt;
-	uint8_t		signal_strength;
-	uint8_t		tx_power_level;
-	uint8_t		counter;
+	uint16_t bad_uplink_crc_cnt;
+	uint8_t	 signal_strength;
+	unsigned tx_power_level		:3;
+	unsigned is_video_relay_on	:1;
+	unsigned is_failsafe_mode	:1;
+	unsigned is_failsafe_com_ok	:1;
+	unsigned ___padding___		:2;
+	uint8_t	 counter;
 }PACKED downlink_t;
 
 CREATE_PACKETIZATION_CODE(downlink_t, KIND_DOWNLINK)

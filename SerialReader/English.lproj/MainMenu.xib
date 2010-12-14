@@ -11,7 +11,7 @@
 			<string key="NS.object.0">823</string>
 		</object>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
-			<integer value="687"/>
+			<integer value="372"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -1558,6 +1558,102 @@
 												<string key="NSContents">0</string>
 												<reference key="NSSupport" ref="554598091"/>
 												<reference key="NSControlView" ref="812343120"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
+										<object class="NSTextField" id="916341188">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{199, 131}, {67, 14}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="488962720">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">Failsafe</string>
+												<reference key="NSSupport" ref="26"/>
+												<reference key="NSControlView" ref="916341188"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
+										<object class="NSTextField" id="83224204">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{252, 130}, {38, 15}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="548160067">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">0</string>
+												<reference key="NSSupport" ref="554598091"/>
+												<reference key="NSControlView" ref="83224204"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
+										<object class="NSTextField" id="783565946">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{161, 108}, {83, 14}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="976170548">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">Failsafe Comm</string>
+												<reference key="NSSupport" ref="26"/>
+												<reference key="NSControlView" ref="783565946"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
+										<object class="NSTextField" id="609715411">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{252, 108}, {38, 15}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="742704610">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">0</string>
+												<reference key="NSSupport" ref="554598091"/>
+												<reference key="NSControlView" ref="609715411"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
+										<object class="NSTextField" id="369335326">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{179, 88}, {67, 14}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="777908864">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">Video Relay</string>
+												<reference key="NSSupport" ref="26"/>
+												<reference key="NSControlView" ref="369335326"/>
+												<reference key="NSBackgroundColor" ref="227871065"/>
+												<reference key="NSTextColor" ref="847364631"/>
+											</object>
+										</object>
+										<object class="NSTextField" id="380771077">
+											<reference key="NSNextResponder" ref="463418672"/>
+											<int key="NSvFlags">268</int>
+											<string key="NSFrame">{{252, 88}, {38, 15}}</string>
+											<reference key="NSSuperview" ref="463418672"/>
+											<bool key="NSEnabled">YES</bool>
+											<object class="NSTextFieldCell" key="NSCell" id="139060404">
+												<int key="NSCellFlags">68288064</int>
+												<int key="NSCellFlags2">272761856</int>
+												<string key="NSContents">0</string>
+												<reference key="NSSupport" ref="554598091"/>
+												<reference key="NSControlView" ref="380771077"/>
 												<reference key="NSBackgroundColor" ref="227871065"/>
 												<reference key="NSTextColor" ref="847364631"/>
 											</object>
@@ -3215,62 +3311,6 @@
 					<int key="connectionID">588</int>
 				</object>
 				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">uplinkpacketFrameLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="933299229"/>
-					</object>
-					<int key="connectionID">648</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">headingPulseLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="416631966"/>
-					</object>
-					<int key="connectionID">649</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">pitchPulseLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="77851452"/>
-					</object>
-					<int key="connectionID">650</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">uplinkPacketCrcLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="294019584"/>
-					</object>
-					<int key="connectionID">651</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">downlinkPacketCrcReportLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="812343120"/>
-					</object>
-					<int key="connectionID">653</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">downlinkPacketCrcLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="588852340"/>
-					</object>
-					<int key="connectionID">654</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">downlinkPacketFrameLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="857265308"/>
-					</object>
-					<int key="connectionID">692</int>
-				</object>
-				<object class="IBConnectionRecord">
 					<object class="IBBindingConnection" key="connection">
 						<string key="label">value: heading</string>
 						<reference key="source" ref="813462065"/>
@@ -3448,46 +3488,6 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBOutletConnection" key="connection">
-						<string key="label">calibrationBoxPanServo</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="236771042"/>
-					</object>
-					<int key="connectionID">776</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">calibrationBoxTiltServo</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="673902416"/>
-					</object>
-					<int key="connectionID">777</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBActionConnection" key="connection">
-						<string key="label">sendBadByte:</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="548610485"/>
-					</object>
-					<int key="connectionID">788</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">downlinkPacketFrameNumberLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="786159435"/>
-					</object>
-					<int key="connectionID">801</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
-						<string key="label">downlinkPacketTxPowerLevelLabel</string>
-						<reference key="source" ref="976324537"/>
-						<reference key="destination" ref="860223888"/>
-					</object>
-					<int key="connectionID">840</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBOutletConnection" key="connection">
 						<string key="label">avTxPowerButton</string>
 						<reference key="source" ref="976324537"/>
 						<reference key="destination" ref="476060520"/>
@@ -3641,6 +3641,54 @@
 						</object>
 					</object>
 					<int key="connectionID">910</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: downlinkWrapper.isFailsafeModeOn</string>
+						<reference key="source" ref="83224204"/>
+						<reference key="destination" ref="976324537"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="83224204"/>
+							<reference key="NSDestination" ref="976324537"/>
+							<string key="NSLabel">value: downlinkWrapper.isFailsafeModeOn</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">downlinkWrapper.isFailsafeModeOn</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">926</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: downlinkWrapper.isFailsafeComOk</string>
+						<reference key="source" ref="609715411"/>
+						<reference key="destination" ref="976324537"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="609715411"/>
+							<reference key="NSDestination" ref="976324537"/>
+							<string key="NSLabel">value: downlinkWrapper.isFailsafeComOk</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">downlinkWrapper.isFailsafeComOk</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">927</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBBindingConnection" key="connection">
+						<string key="label">value: downlinkWrapper.isVideoRelayOn</string>
+						<reference key="source" ref="380771077"/>
+						<reference key="destination" ref="976324537"/>
+						<object class="NSNibBindingConnector" key="connector">
+							<reference key="NSSource" ref="380771077"/>
+							<reference key="NSDestination" ref="976324537"/>
+							<string key="NSLabel">value: downlinkWrapper.isVideoRelayOn</string>
+							<string key="NSBinding">value</string>
+							<string key="NSKeyPath">downlinkWrapper.isVideoRelayOn</string>
+							<int key="NSNibBindingConnectorVersion">2</int>
+						</object>
+					</object>
+					<int key="connectionID">928</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -4662,9 +4710,9 @@
 							<reference ref="279750080"/>
 							<reference ref="933299229"/>
 							<reference ref="77851452"/>
-							<reference ref="416631966"/>
 							<reference ref="443849284"/>
 							<reference ref="294019584"/>
+							<reference ref="416631966"/>
 						</array>
 						<reference key="parent" ref="439893737"/>
 					</object>
@@ -4682,8 +4730,14 @@
 							<reference ref="132545198"/>
 							<reference ref="203757805"/>
 							<reference ref="860223888"/>
-							<reference ref="802032963"/>
 							<reference ref="786159435"/>
+							<reference ref="916341188"/>
+							<reference ref="83224204"/>
+							<reference ref="783565946"/>
+							<reference ref="609715411"/>
+							<reference ref="369335326"/>
+							<reference ref="380771077"/>
+							<reference ref="802032963"/>
 						</array>
 						<reference key="parent" ref="439893737"/>
 					</object>
@@ -5374,6 +5428,84 @@
 						<reference key="object" ref="798509094"/>
 						<reference key="parent" ref="1037445258"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">911</int>
+						<reference key="object" ref="916341188"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="488962720"/>
+						</array>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">912</int>
+						<reference key="object" ref="83224204"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="548160067"/>
+						</array>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">913</int>
+						<reference key="object" ref="548160067"/>
+						<reference key="parent" ref="83224204"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">914</int>
+						<reference key="object" ref="488962720"/>
+						<reference key="parent" ref="916341188"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">916</int>
+						<reference key="object" ref="783565946"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="976170548"/>
+						</array>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">917</int>
+						<reference key="object" ref="609715411"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="742704610"/>
+						</array>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">918</int>
+						<reference key="object" ref="742704610"/>
+						<reference key="parent" ref="609715411"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">919</int>
+						<reference key="object" ref="976170548"/>
+						<reference key="parent" ref="783565946"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">921</int>
+						<reference key="object" ref="369335326"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="777908864"/>
+						</array>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">922</int>
+						<reference key="object" ref="380771077"/>
+						<array class="NSMutableArray" key="children">
+							<reference ref="139060404"/>
+						</array>
+						<reference key="parent" ref="461187325"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">923</int>
+						<reference key="object" ref="139060404"/>
+						<reference key="parent" ref="380771077"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">924</int>
+						<reference key="object" ref="777908864"/>
+						<reference key="parent" ref="369335326"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -5506,9 +5638,9 @@
 				<integer value="1" key="351.ImportedFromIB2"/>
 				<string key="354.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="1" key="354.ImportedFromIB2"/>
-				<string key="371.IBEditorWindowLastContentRect">{{480, 6}, {672, 629}}</string>
+				<string key="371.IBEditorWindowLastContentRect">{{376, 36}, {672, 629}}</string>
 				<string key="371.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
-				<string key="371.IBWindowTemplateEditedContentRect">{{480, 6}, {672, 629}}</string>
+				<string key="371.IBWindowTemplateEditedContentRect">{{376, 36}, {672, 629}}</string>
 				<integer value="1" key="371.NSWindowTemplate.visibleAtLaunch"/>
 				<string key="371.editorWindowContentRectSynchronizationRect">{{33, 99}, {480, 360}}</string>
 				<string key="371.windowTemplate.maxSize">{3.40282e+38, 3.40282e+38}</string>
@@ -5649,6 +5781,9 @@
 				<string key="630.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="631.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="632.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="632.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABCpAAAwoQAAA</bytes>
+				</object>
 				<string key="633.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="634.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="635.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -5657,8 +5792,14 @@
 				<string key="638.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="639.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="640.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="640.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABAgAAAww0AAA</bytes>
+				</object>
 				<string key="641.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="642.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="642.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABCpAAAww0AAA</bytes>
+				</object>
 				<string key="643.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="644.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<object class="NSAffineTransform" key="644.IBViewBoundsToFrameTransform">
@@ -5778,14 +5919,44 @@
 				<string key="849.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="850.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="851.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="911.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="911.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABDMwAAww0AAA</bytes>
+				</object>
+				<string key="912.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="912.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABDaAAAww0AAA</bytes>
+				</object>
+				<string key="913.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="914.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="916.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="916.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABDDQAAwuwAAA</bytes>
+				</object>
+				<string key="917.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="917.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABDaAAAwu4AAA</bytes>
+				</object>
+				<string key="918.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="919.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<string key="92.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 				<integer value="1" key="92.ImportedFromIB2"/>
+				<string key="921.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="921.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABDHwAAwsQAAA</bytes>
+				</object>
+				<string key="922.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<object class="NSAffineTransform" key="922.IBViewBoundsToFrameTransform">
+					<bytes key="NSTransformStruct">P4AAAL+AAABDaAAAwsYAAA</bytes>
+				</object>
+				<string key="923.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
+				<string key="924.IBPluginDependency">com.apple.InterfaceBuilder.CocoaPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">910</int>
+			<int key="maxID">928</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -5814,7 +5985,6 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="centerServos:">id</string>
 						<string key="changeAvTxPowerLevel:">id</string>
-						<string key="sendBadByte:">id</string>
 						<string key="servoCalibrationChanged:">id</string>
 						<string key="startReadingSensorData:">id</string>
 						<string key="stopReadingSensorData:">id</string>
@@ -5826,10 +5996,6 @@
 						</object>
 						<object class="IBActionInfo" key="changeAvTxPowerLevel:">
 							<string key="name">changeAvTxPowerLevel:</string>
-							<string key="candidateClassName">id</string>
-						</object>
-						<object class="IBActionInfo" key="sendBadByte:">
-							<string key="name">sendBadByte:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="servoCalibrationChanged:">
@@ -5847,26 +6013,13 @@
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="outlets">
 						<string key="avTxPowerButton">NSPopUpButton</string>
-						<string key="calibrateEnableButton">NSButton</string>
-						<string key="calibrationBoxPanServo">NSBox</string>
-						<string key="calibrationBoxTiltServo">NSBox</string>
-						<string key="downlinkPacketCrcLabel">NSTextField</string>
-						<string key="downlinkPacketCrcReportLabel">NSTextField</string>
-						<string key="downlinkPacketFrameLabel">NSTextField</string>
-						<string key="downlinkPacketFrameNumberLabel">NSTextField</string>
-						<string key="downlinkPacketSignalStrengthLabel">NSTextField</string>
-						<string key="downlinkPacketTxPowerLevelLabel">NSTextField</string>
 						<string key="headingLabel">NSTextField</string>
-						<string key="headingPulseLabel">NSTextField</string>
 						<string key="headingSlider">NSSlider</string>
 						<string key="pitchLabel">NSTextField</string>
-						<string key="pitchPulseLabel">NSTextField</string>
 						<string key="pitchSlider">NSSlider</string>
 						<string key="rollLabel">NSTextField</string>
 						<string key="rollSlider">NSSlider</string>
 						<string key="theSensorView">SensorView</string>
-						<string key="uplinkPacketCrcLabel">NSTextField</string>
-						<string key="uplinkpacketFrameLabel">NSTextField</string>
 						<string key="window">NSWindow</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -5874,48 +6027,8 @@
 							<string key="name">avTxPowerButton</string>
 							<string key="candidateClassName">NSPopUpButton</string>
 						</object>
-						<object class="IBToOneOutletInfo" key="calibrateEnableButton">
-							<string key="name">calibrateEnableButton</string>
-							<string key="candidateClassName">NSButton</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="calibrationBoxPanServo">
-							<string key="name">calibrationBoxPanServo</string>
-							<string key="candidateClassName">NSBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="calibrationBoxTiltServo">
-							<string key="name">calibrationBoxTiltServo</string>
-							<string key="candidateClassName">NSBox</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="downlinkPacketCrcLabel">
-							<string key="name">downlinkPacketCrcLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="downlinkPacketCrcReportLabel">
-							<string key="name">downlinkPacketCrcReportLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="downlinkPacketFrameLabel">
-							<string key="name">downlinkPacketFrameLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="downlinkPacketFrameNumberLabel">
-							<string key="name">downlinkPacketFrameNumberLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="downlinkPacketSignalStrengthLabel">
-							<string key="name">downlinkPacketSignalStrengthLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="downlinkPacketTxPowerLevelLabel">
-							<string key="name">downlinkPacketTxPowerLevelLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
 						<object class="IBToOneOutletInfo" key="headingLabel">
 							<string key="name">headingLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="headingPulseLabel">
-							<string key="name">headingPulseLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="headingSlider">
@@ -5924,10 +6037,6 @@
 						</object>
 						<object class="IBToOneOutletInfo" key="pitchLabel">
 							<string key="name">pitchLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="pitchPulseLabel">
-							<string key="name">pitchPulseLabel</string>
 							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="pitchSlider">
@@ -5945,14 +6054,6 @@
 						<object class="IBToOneOutletInfo" key="theSensorView">
 							<string key="name">theSensorView</string>
 							<string key="candidateClassName">SensorView</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="uplinkPacketCrcLabel">
-							<string key="name">uplinkPacketCrcLabel</string>
-							<string key="candidateClassName">NSTextField</string>
-						</object>
-						<object class="IBToOneOutletInfo" key="uplinkpacketFrameLabel">
-							<string key="name">uplinkpacketFrameLabel</string>
-							<string key="candidateClassName">NSTextField</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="window">
 							<string key="name">window</string>

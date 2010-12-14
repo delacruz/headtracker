@@ -20,6 +20,9 @@
 -(unsigned short)badUplinkCrcCount;
 -(unsigned char)signalStrength;
 -(unsigned char)txPowerLevel;
+-(bool)isVideoRelayOn;
+-(bool)isFailsafeModeOn;
+-(bool)isFailsafeComOk;
 -(unsigned char)counter;
 -(NSString*)downlinkPktAsString;
 
