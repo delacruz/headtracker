@@ -11,7 +11,6 @@
 #define CRC16_H
 
 #include <util/crc16.h>
-#include "headtracker_defs.h"
 
 uint16_t crc16_array_update(const void* array, uint8_t length);
 

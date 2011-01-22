@@ -12,7 +12,6 @@
 #include <string.h>
 #include "Servo.h"
 #include "RCInput.h" 
-#include "headtracker_defs.h"
 #include "crc16.h"
 #include "Delay.h"
 #include <avr/io.h>

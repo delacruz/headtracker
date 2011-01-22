@@ -14,7 +14,6 @@
 		962D9EB112B0766100B2AE1D /* header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = header.h; sourceTree = "<group>"; };
 		962D9EB212B0766100B2AE1D /* packet_kinds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = packet_kinds.h; sourceTree = "<group>"; };
 		962D9EB312B0766100B2AE1D /* uplink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uplink.h; sourceTree = "<group>"; };
-		962E4AE312A1C5D100F49118 /* headtracker_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = headtracker_defs.h; sourceTree = "<group>"; };
 		962E4AEB12A1C74C00F49118 /* crc16.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crc16.h; sourceTree = "<group>"; };
 		962E4AEC12A1C74C00F49118 /* crc16.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = crc16.c; sourceTree = "<group>"; };
 		969CFC8C128246A30009DF8C /* a2d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = a2d.h; sourceTree = "<group>"; };
@@ -84,7 +83,6 @@
 			children = (
 				4079525F0CEA38CC00E202DC /* Makefile */,
 				4079525E0CEA38CC00E202DC /* main.c */,
-				962E4AE312A1C5D100F49118 /* headtracker_defs.h */,
 				962E4AEB12A1C74C00F49118 /* crc16.h */,
 				962E4AEC12A1C74C00F49118 /* crc16.c */,
 			);

@@ -187,11 +187,11 @@ void Sync(unsigned char* buffer, unsigned char* index)
 	[self addObserver:self forKeyPath:@"pitch" options:NSKeyValueObservingOptionOld context:nil];
 	[self addObserver:self forKeyPath:@"roll" options:NSKeyValueObservingOptionOld context:nil];
 	
-	NSNumberFormatter *floatFieldFormatter = [[[NSNumberFormatter alloc]init]autorelease];
-	[floatFieldFormatter setFormat:@"##0.0"];
-	[headingLabel setFormatter:floatFieldFormatter];
-	[pitchLabel setFormatter:floatFieldFormatter];
-	[rollLabel setFormatter:floatFieldFormatter];
+//	NSNumberFormatter *floatFieldFormatter = [[[NSNumberFormatter alloc]init]autorelease];
+//	[floatFieldFormatter setFormat:@"##0.0"];
+//	[headingLabel setFormatter:floatFieldFormatter];
+//	[pitchLabel setFormatter:floatFieldFormatter];
+//	[rollLabel setFormatter:floatFieldFormatter];
 	
 	calculatedPulsePitch = 1500;
 	calculatedPulseHeading = 1500;

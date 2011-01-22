@@ -13,7 +13,10 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		961721CC122DECE1009030C7 /* serialreader.c in Sources */ = {isa = PBXBuildFile; fileRef = 961721CB122DECE1009030C7 /* serialreader.c */; };
+		9618B60412EA7FC700414CEB /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9618B60312EA7FC700414CEB /* QuartzCore.framework */; };
+		9618B61312EA804500414CEB /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9618B61212EA804500414CEB /* QTKit.framework */; };
 		9623834012B325A700F277CC /* DownlinkWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9623833F12B325A700F277CC /* DownlinkWrapper.m */; };
+		96315C3912E7E19000F55D96 /* CaptureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 96315C3812E7E19000F55D96 /* CaptureView.m */; };
 		9657967A12B538B40083AB66 /* UplinkWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9657967912B538B40083AB66 /* UplinkWrapper.m */; };
 		96D2AF8E128749DD00715033 /* crc16.c in Sources */ = {isa = PBXBuildFile; fileRef = 96D2AF8D128749DD00715033 /* crc16.c */; };
 		96E512541244103C00E2C83F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96E512531244103C00E2C83F /* OpenGL.framework */; };
@@ -35,6 +38,8 @@
 		8D1107310486CEB800E47090 /* SerialReader-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "SerialReader-Info.plist"; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* SerialReader.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SerialReader.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		961721CB122DECE1009030C7 /* serialreader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = serialreader.c; sourceTree = "<group>"; };
+		9618B60312EA7FC700414CEB /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		9618B61212EA804500414CEB /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = System/Library/Frameworks/QTKit.framework; sourceTree = SDKROOT; };
 		9623833E12B325A700F277CC /* DownlinkWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DownlinkWrapper.h; sourceTree = "<group>"; };
 		9623833F12B325A700F277CC /* DownlinkWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DownlinkWrapper.m; sourceTree = "<group>"; };
 		962D9BD112ADC12A00B2AE1D /* downlink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = downlink.h; sourceTree = "<group>"; };
@@ -42,6 +47,8 @@
 		962D9BD312ADC12A00B2AE1D /* packet_kinds.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = packet_kinds.h; sourceTree = "<group>"; };
 		962D9BD512ADC12A00B2AE1D /* uplink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uplink.h; sourceTree = "<group>"; };
 		962D9C6612B049D500B2AE1D /* generic_packet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = generic_packet.h; sourceTree = "<group>"; };
+		96315C3712E7E19000F55D96 /* CaptureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CaptureView.h; sourceTree = "<group>"; };
+		96315C3812E7E19000F55D96 /* CaptureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CaptureView.m; sourceTree = "<group>"; };
 		9657967812B538B40083AB66 /* UplinkWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UplinkWrapper.h; sourceTree = "<group>"; };
 		9657967912B538B40083AB66 /* UplinkWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UplinkWrapper.m; sourceTree = "<group>"; };
 		9691F84712877AAD007C7864 /* serialreader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serialreader.h; sourceTree = "<group>"; };
@@ -61,6 +68,8 @@
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				96E512541244103C00E2C83F /* OpenGL.framework in Frameworks */,
 				96E512581244104700E2C83F /* GLUT.framework in Frameworks */,
+				9618B60412EA7FC700414CEB /* QuartzCore.framework in Frameworks */,
+				9618B61312EA804500414CEB /* QTKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +87,8 @@
 				9623833F12B325A700F277CC /* DownlinkWrapper.m */,
 				9657967812B538B40083AB66 /* UplinkWrapper.h */,
 				9657967912B538B40083AB66 /* UplinkWrapper.m */,
+				96315C3712E7E19000F55D96 /* CaptureView.h */,
+				96315C3812E7E19000F55D96 /* CaptureView.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -119,6 +130,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				9618B60312EA7FC700414CEB /* QuartzCore.framework */,
 			);
 			name = SerialReader;
 			sourceTree = "<group>";
@@ -151,6 +163,7 @@
 			children = (
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+				9618B61212EA804500414CEB /* QTKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -237,6 +250,7 @@
 				96D2AF8E128749DD00715033 /* crc16.c in Sources */,
 				9623834012B325A700F277CC /* DownlinkWrapper.m in Sources */,
 				9657967A12B538B40083AB66 /* UplinkWrapper.m in Sources */,
+				96315C3912E7E19000F55D96 /* CaptureView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
